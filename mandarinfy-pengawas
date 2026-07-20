@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandarinfy — Panel Pengawas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Poppins:wght@400;500;600;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6; --paper:#FFFDF9; --ink:#2B2320;
+    --red:#B3272D; --red-dark:#8C1F24; --blush:#FBE1E1;
+    --gold:#C9982E; --line:#E7D9C4; --ok:#3E7D4C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream);
+    background-image:radial-gradient(circle at 100% 0%, rgba(179,39,45,0.06), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(201,152,46,0.08), transparent 40%);
+    font-family:'Poppins', sans-serif; color:var(--ink); min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Noto Serif SC', serif; margin:0; }
+  .cn{ font-family:'Zhi Mang Xing', cursive; color:var(--red); }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; padding:18px 28px;
+    background:var(--paper); border-bottom:3px solid var(--red);
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo .seal{
+    width:36px; height:36px; border-radius:10px; background:var(--red); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:'Noto Serif SC';
+    font-weight:900; font-size:18px; box-shadow:0 3px 0 var(--red-dark);
+  }
+  .logo .word{ font-size:20px; font-weight:700; }
+  .pill{ font-size:12px; padding:6px 12px; border-radius:999px; background:var(--blush); color:var(--red-dark); font-weight:600; }
+
+  /* ---------- gate screen ---------- */
+  .gate-wrap{ max-width:420px; margin:90px auto; background:var(--paper); border:1px solid var(--line);
+    border-radius:20px; padding:38px 34px; box-shadow:0 20px 50px -25px rgba(43,35,32,0.35); text-align:center; }
+  .gate-wrap .icon{
+    width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:var(--blush);
+    display:flex; align-items:center; justify-content:center; font-size:26px; color:var(--red);
+  }
+  .gate-wrap h2{ font-size:22px; margin-bottom:6px; }
+  .gate-wrap p{ font-size:13px; color:#8a7b6a; margin-bottom:22px; line-height:1.6; }
+  .gate-wrap input{
+    width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line);
+    font-family:'Poppins'; font-size:15px; text-align:center; letter-spacing:2px; outline:none; margin-bottom:12px;
+  }
+  .gate-wrap input:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+  .btn{ appearance:none; border:none; cursor:pointer; font-family:'Poppins'; font-weight:600;
+    padding:13px 22px; border-radius:12px; font-size:15px; transition:.15s; }
+  .btn-primary{ background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); width:100%; }
+  .btn-primary:hover{ transform:translateY(1px); box-shadow:0 3px 0 var(--red-dark); }
+  .btn-ghost{ background:transparent; color:var(--red-dark); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--red); }
+  .gate-err{ color:var(--red-dark); font-size:12.5px; margin:-4px 0 12px; display:none; }
+
+  /* ---------- dashboard ---------- */
+  .wrap{ max-width:1200px; margin:0 auto; padding:30px 20px 80px; }
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px; }
+  @media (max-width:800px){ .stats{ grid-template-columns:1fr 1fr; } }
+  .stat-card{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .stat-card .num{ font-family:'Noto Serif SC'; font-weight:900; font-size:28px; color:var(--red); }
+  .stat-card .label{ font-size:12px; color:#8a7b6a; margin-top:4px; }
+
+  .top-actions{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px; }
+  .top-actions h2{ font-size:20px; }
+  .top-actions .sub{ font-size:12.5px; color:#8a7b6a; margin-top:4px; }
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  .search-box{
+    margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  }
+  .search-box input{
+    flex:1; min-width:220px; padding:11px 14px; border-radius:12px; border:1.5px solid var(--line);
+    font-family:'Poppins'; font-size:14px; outline:none;
+  }
+  .search-box input:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+
+  table.sheet{ width:100%; border-collapse:collapse; background:var(--paper); border-radius:14px; overflow:hidden;
+    box-shadow:0 6px 18px -14px rgba(43,35,32,0.5); font-size:13px; }
+  table.sheet th{ background:var(--red); color:#fff; text-align:left; padding:11px 12px; font-weight:600; white-space:nowrap; position:sticky; top:0; }
+  table.sheet td{ padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.sheet tr:nth-child(even) td{ background:#fbf6ec; }
+  table.sheet td.writing-cell{ max-width:230px; white-space:pre-wrap; font-size:12.5px; color:#5a4c3d; }
+  table.sheet th.sortable{ cursor:pointer; user-select:none; }
+  table.sheet th.sortable:hover{ background:var(--red-dark); }
+  .score-cell{ font-weight:700; color:var(--red-dark); white-space:nowrap; }
+
+  .table-scroll{ overflow:auto; max-height:70vh; border-radius:14px; }
+  .empty-note{ text-align:center; color:#9a897a; font-size:14px; padding:60px 20px; background:var(--paper);
+    border:1px dashed var(--line); border-radius:14px; }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px;
+    box-shadow:0 10px 30px -10px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:.25s; z-index:99;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; font-size:11.5px; color:#a99a89; margin-top:36px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ GATE (password) ============ -->
+<div id="screen-gate">
+  <div class="topbar">
+    <div class="logo"><div class="seal">中</div><div class="word">Mandarinfy <span class="cn">学中文</span></div></div>
+    <div class="pill">Panel Pengawas</div>
+  </div>
+  <div class="gate-wrap">
+    <div class="icon">🔒</div>
+    <h2>Akses Khusus Pengawas</h2>
+    <p>Halaman ini hanya untuk pengawas ujian. Masukkan kode akses untuk melihat rekap nilai seluruh peserta.</p>
+    <input type="password" id="in-code" placeholder="Kode akses" autocomplete="off">
+    <div class="gate-err" id="gate-err">Kode akses salah, coba lagi.</div>
+    <button class="btn btn-primary" id="btn-unlock">Buka Rekap Nilai</button>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="screen-dash" class="hidden">
+  <div class="topbar">
+    <div class="logo"><div class="seal">中</div><div class="word">Mandarinfy <span class="cn">学中文</span></div></div>
+    <div class="pill">Panel Pengawas</div>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat-card"><div class="num" id="st-total">0</div><div class="label">Peserta mengumpulkan</div></div>
+      <div class="stat-card"><div class="num" id="st-avg">0</div><div class="label">Rata-rata skor reading (dari 50)</div></div>
+      <div class="stat-card"><div class="num" id="st-max">0</div><div class="label">Skor tertinggi</div></div>
+      <div class="stat-card"><div class="num" id="st-min">0</div><div class="label">Skor terendah</div></div>
+    </div>
+
+    <div class="top-actions">
+      <div>
+        <h2>Rekap Semua Peserta</h2>
+        <div class="sub">Jumlah jawaban benar reading per peserta, plus jawaban writing (tanpa koreksi otomatis).</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="btn-refresh">↻ Refresh</button>
+        <button class="btn btn-ghost" id="btn-export-csv">⭳ Export CSV</button>
+        <button class="btn btn-ghost" id="btn-lock">🔒 Kunci Halaman</button>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="in-search" placeholder="Cari nama atau kelas…">
+    </div>
+
+    <div id="table-mount"><div class="empty-note">Memuat data…</div></div>
+    <div class="footer-note">Mandarinfy — Panel Pengawas. Data direkap otomatis dari setiap pengumpulan ujian.</div>
+  </div>
+</div>
+
+<script>
+/* ganti kode akses ini sesuai kebutuhan sekolah/kelasmu */
+const ACCESS_CODE = "MANDARINFY2026";
+
+/* Tempel URL Web App Google Apps Script yang sama seperti di mandarinfy.html */
+const API_URL = "https://script.google.com/macros/s/AKfycbx4jOA-D0n2auj42W6yhfcF6glIMDzxoZ3-31it6u5uoRzsxfMzsHiKNhsSJtNptCqs/exec";
+
+let sortKey = "waktu";
+let sortDir = -1; // -1 = terbaru dulu / desc
+let allRows = [];
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2600);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+document.getElementById("btn-unlock").addEventListener("click", tryUnlock);
+document.getElementById("in-code").addEventListener("keydown", e => { if(e.key==="Enter") tryUnlock(); });
+
+function tryUnlock(){
+  const val = document.getElementById("in-code").value.trim();
+  const err = document.getElementById("gate-err");
+  if(val !== ACCESS_CODE){
+    err.style.display = "block";
+    return;
+  }
+  err.style.display = "none";
+  document.getElementById("screen-gate").classList.add("hidden");
+  document.getElementById("screen-dash").classList.remove("hidden");
+  loadData();
+}
+
+document.getElementById("btn-lock").addEventListener("click", () => {
+  document.getElementById("screen-dash").classList.add("hidden");
+  document.getElementById("screen-gate").classList.remove("hidden");
+  document.getElementById("in-code").value = "";
+});
+document.getElementById("btn-refresh").addEventListener("click", loadData);
+
+async function loadData(){
+  const mount = document.getElementById("table-mount");
+  mount.innerHTML = `<div class="empty-note">Memuat data…</div>`;
+  try{
+    if(!API_URL || API_URL.includes("PASTE_URL")){
+      mount.innerHTML = `<div class="empty-note">API_URL belum diisi. Tempel URL Google Apps Script kamu di bagian atas &lt;script&gt; pada file ini.</div>`;
+      return;
+    }
+    const res = await fetch(API_URL, { method: "GET" });
+    const raw = await res.json();
+    // ubah dari format kolom sheet (Waktu, Nama, Kelas, SkorBenar, TotalSoal, W1..Wn)
+    // ke bentuk internal {waktu, nama, kelas, skorReading, totalReading, writing:[{jawaban}]}
+    const rows = raw.map(r => {
+      const writing = Object.keys(r)
+        .filter(k => /^W\d+$/.test(k))
+        .sort((a,b) => parseInt(a.slice(1)) - parseInt(b.slice(1)))
+        .map(k => ({ jawaban: r[k] }));
+      return {
+        waktu: r.Waktu,
+        nama: r.Nama,
+        kelas: r.Kelas,
+        skorReading: Number(r.SkorBenar),
+        totalReading: Number(r.TotalSoal),
+        writing
+      };
+    });
+    allRows = rows;
+    renderStats(rows);
+    renderTable(sortRows(rows));
+  }catch(e){
+    console.error(e);
+    mount.innerHTML = `<div class="empty-note">Gagal memuat data. Cek koneksi internet / konfigurasi API_URL, lalu refresh.</div>`;
+  }
+}
+
+function renderStats(rows){
+  document.getElementById("st-total").textContent = rows.length;
+  if(rows.length === 0){
+    document.getElementById("st-avg").textContent = "0";
+    document.getElementById("st-max").textContent = "0";
+    document.getElementById("st-min").textContent = "0";
+    return;
+  }
+  const scores = rows.map(r => r.skorReading);
+  const avg = (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1);
+  document.getElementById("st-avg").textContent = avg;
+  document.getElementById("st-max").textContent = Math.max(...scores);
+  document.getElementById("st-min").textContent = Math.min(...scores);
+}
+
+function sortRows(rows){
+  const sorted = rows.slice().sort((a,b) => {
+    let av, bv;
+    if(sortKey === "waktu"){ av = new Date(a.waktu).getTime(); bv = new Date(b.waktu).getTime(); }
+    else if(sortKey === "skorReading"){ av = a.skorReading; bv = b.skorReading; }
+    else { av = (a[sortKey]||"").toString().toLowerCase(); bv = (b[sortKey]||"").toString().toLowerCase(); }
+    if(av < bv) return -1*sortDir;
+    if(av > bv) return 1*sortDir;
+    return 0;
+  });
+  return sorted;
+}
+
+function renderTable(rows){
+  const mount = document.getElementById("table-mount");
+  if(rows.length === 0){
+    mount.innerHTML = `<div class="empty-note">Tidak ada peserta yang cocok.</div>`;
+    return;
+  }
+  const writingCount = (rows[0].writing || []).length;
+  const writingCols = Array.from({length: writingCount}, (_,i)=>`W${i+1}`);
+
+  let html = `<div class="table-scroll"><table class="sheet"><thead><tr>
+    <th class="sortable" data-key="waktu">Waktu ⇅</th>
+    <th class="sortable" data-key="nama">Nama ⇅</th>
+    <th class="sortable" data-key="kelas">Kelas ⇅</th>
+    <th class="sortable" data-key="skorReading">Skor Benar ⇅</th>
+    ${writingCols.map(c=>`<th>${c}</th>`).join("")}
+    </tr></thead><tbody>`;
+  rows.forEach(r => {
+    html += `<tr>
+      <td>${new Date(r.waktu).toLocaleString("id-ID")}</td>
+      <td>${escapeHtml(r.nama||"")}</td>
+      <td>${escapeHtml(r.kelas||"")}</td>
+      <td class="score-cell">${r.skorReading} / ${r.totalReading}</td>
+      ${(r.writing||[]).map(w => `<td class="writing-cell">${escapeHtml(w.jawaban||"—")}</td>`).join("")}
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+  mount.innerHTML = html;
+
+  mount.querySelectorAll("th.sortable").forEach(th => {
+    th.addEventListener("click", () => {
+      const key = th.getAttribute("data-key");
+      if(sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = -1; }
+      applyFilterAndRender();
+    });
+  });
+}
+
+function applyFilterAndRender(){
+  const q = document.getElementById("in-search").value.trim().toLowerCase();
+  let rows = allRows;
+  if(q){
+    rows = rows.filter(r =>
+      (r.nama||"").toLowerCase().includes(q) || (r.kelas||"").toLowerCase().includes(q)
+    );
+  }
+  renderTable(sortRows(rows));
+}
+
+document.getElementById("in-search").addEventListener("input", applyFilterAndRender);
+
+document.getElementById("btn-export-csv").addEventListener("click", () => {
+  const rows = sortRows(allRows);
+  if(rows.length === 0){ toast("Belum ada data untuk diekspor."); return; }
+  const writingCount = (rows[0].writing || []).length;
+  const writingCols = Array.from({length: writingCount}, (_,i)=>`W${i+1}`);
+  const header = ["Waktu","Nama","Kelas","Skor Benar","Total Soal", ...writingCols];
+  const csvRows = [header.join(",")];
+  rows.forEach(r => {
+    const line = [
+      new Date(r.waktu).toLocaleString("id-ID"),
+      r.nama, r.kelas, r.skorReading, r.totalReading,
+      ...(r.writing||[]).map(w => (w.jawaban||"").replace(/\n/g," "))
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+    csvRows.push(line.join(","));
+  });
+  const blob = new Blob([csvRows.join("\n")], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `mandarinfy-rekap-pengawas-${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("CSV berhasil diunduh — bisa langsung diimpor ke Google Sheets.");
+});
+</script>
+</body>
+</html>
