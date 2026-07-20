@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandarinfy — Ujian HSK 2 (Bab 1–8)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Poppins:wght@400;500;600;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6;
+    --paper:#FFFDF9;
+    --ink:#2B2320;
+    --red:#B3272D;
+    --red-dark:#8C1F24;
+    --blush:#FBE1E1;
+    --gold:#C9982E;
+    --line:#E7D9C4;
+    --ok:#3E7D4C;
+    --bad:#B3272D;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(179,39,45,0.06), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(201,152,46,0.08), transparent 40%);
+    font-family:'Poppins', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Noto Serif SC', serif; margin:0; }
+  .brand-mark{
+    font-family:'Zhi Mang Xing', cursive;
+    color:var(--red);
+  }
+  ::selection{ background:var(--blush); }
+
+  /* ---------- shell / topbar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px;
+    background:var(--paper);
+    border-bottom:3px solid var(--red);
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo .seal{
+    width:36px; height:36px; border-radius:10px;
+    background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC'; font-weight:900; font-size:18px;
+    box-shadow:0 3px 0 var(--red-dark);
+  }
+  .logo .word{ font-size:20px; font-weight:700; letter-spacing:.2px; }
+  .logo .word .cn{ font-size:13px; color:var(--red); margin-left:6px; font-weight:500;}
+  .pill{
+    font-size:12px; padding:6px 12px; border-radius:999px;
+    background:var(--blush); color:var(--red-dark); font-weight:600;
+  }
+  .userinfo{ font-size:13px; color:#5a4c3d; text-align:right; }
+  .userinfo b{ color:var(--ink); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:32px 20px 80px; }
+
+  /* ---------- login screen ---------- */
+  .login-hero{
+    display:grid; grid-template-columns:1.1fr .9fr; gap:0;
+    max-width:920px; margin:48px auto; background:var(--paper);
+    border-radius:22px; overflow:hidden; box-shadow:0 20px 50px -25px rgba(43,35,32,0.35);
+    border:1px solid var(--line);
+  }
+  .login-left{
+    background:
+      linear-gradient(180deg, rgba(179,39,45,0.94), rgba(140,31,36,0.96)),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 22px);
+    color:#fff; padding:44px 36px; display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .login-left h1{ font-size:40px; line-height:1.05; color:#fff; }
+  .login-left .cn-big{ font-family:'Zhi Mang Xing', cursive; font-size:52px; display:block; opacity:.92; }
+  .login-left p{ opacity:.85; font-size:14px; line-height:1.6; margin-top:14px; }
+  .stamp-ring{
+    align-self:flex-start; margin-top:26px; width:96px; height:96px; border-radius:50%;
+    border:2.5px solid rgba(255,255,255,0.75); display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC'; font-weight:900; font-size:13px; text-align:center; line-height:1.3;
+    transform:rotate(-8deg); color:#fff;
+  }
+  .login-right{ padding:40px 36px; }
+  .login-right h2{ font-size:22px; margin-bottom:4px; }
+  .login-right .sub{ font-size:13px; color:#7a6a58; margin-bottom:24px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#544639; }
+  .field input{
+    width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line);
+    font-family:'Poppins'; font-size:15px; background:#fffefb; outline:none; transition:.15s;
+  }
+  .field input:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+  .btn{
+    appearance:none; border:none; cursor:pointer; font-family:'Poppins'; font-weight:600;
+    padding:14px 22px; border-radius:12px; font-size:15px; transition:.15s;
+  }
+  .btn-primary{ background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); width:100%; }
+  .btn-primary:hover{ transform:translateY(1px); box-shadow:0 3px 0 var(--red-dark); }
+  .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-ghost{ background:transparent; color:var(--red-dark); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--red); }
+  .login-foot{ text-align:center; margin-top:16px; font-size:12px; color:#9a897a; }
+  .login-foot button{ background:none;border:none;color:var(--red-dark);font-weight:600;cursor:pointer;text-decoration:underline; font-family:'Poppins'; font-size:12px;}
+  .err{ color:var(--bad); font-size:12.5px; margin-top:-8px; margin-bottom:14px; display:none; }
+
+  /* ---------- exam page ---------- */
+  .exam-head{ margin-bottom:26px; }
+  .exam-head h1{ font-size:28px; }
+  .exam-head .meta{ font-size:13px; color:#7a6a58; margin-top:6px; }
+  .progressbar{ height:8px; background:var(--blush); border-radius:99px; margin-top:16px; overflow:hidden; }
+  .progressbar > div{ height:100%; background:var(--red); width:0%; transition:width .2s; }
+
+  .bab-tab{
+    display:flex; align-items:center; gap:12px; margin:36px 0 14px;
+  }
+  .bab-tab .num{
+    width:44px; height:44px; border-radius:12px; color:#fff; display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC'; font-weight:900; font-size:15px; flex:none;
+    box-shadow:0 3px 0 rgba(0,0,0,0.15);
+  }
+  .bab-tab .title{ font-size:17px; font-weight:700; }
+  .bab-tab .title span{ display:block; font-size:12px; font-weight:500; color:#8a7b6a; }
+
+  .qcard{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px;
+    padding:20px 22px; margin-bottom:14px; box-shadow:0 6px 18px -14px rgba(43,35,32,0.5);
+  }
+  .qcard .qhead{ display:flex; gap:10px; align-items:baseline; margin-bottom:10px; }
+  .qcard .qnum{ color:var(--red); font-weight:700; font-size:14px; flex:none; }
+  .qcard .qtext{ font-size:16.5px; font-weight:500; line-height:1.5; }
+  .qcard .qtext .hint{ display:block; font-size:12.5px; color:#8a7b6a; font-weight:400; margin-top:3px; }
+  .opts{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:12px; }
+  @media (max-width:600px){ .opts{ grid-template-columns:1fr; } }
+  .opt{
+    display:flex; align-items:center; gap:9px; border:1.5px solid var(--line); border-radius:11px;
+    padding:11px 13px; cursor:pointer; font-size:15px; background:#fffefb; transition:.12s;
+  }
+  .opt:hover{ border-color:#e3b9ba; }
+  .opt input{ accent-color:var(--red); width:16px; height:16px; flex:none; }
+  .opt.selected{ border-color:var(--red); background:var(--blush); font-weight:600; }
+
+  .writing-card textarea{
+    width:100%; margin-top:12px; border:1.5px solid var(--line); border-radius:12px;
+    padding:12px 14px; font-family:'Poppins'; font-size:15px; resize:vertical; min-height:64px; outline:none;
+  }
+  .writing-card textarea:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+
+  .submit-zone{
+    margin-top:34px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;
+    padding:22px; text-align:center;
+  }
+  .submit-zone p{ font-size:13px; color:#8a7b6a; margin:8px 0 16px; }
+  .submit-zone .btn-primary{ width:auto; padding:14px 40px; }
+
+  /* ---------- result screen ---------- */
+  .result-wrap{ max-width:560px; margin:60px auto; text-align:center; }
+  .seal-big{
+    width:150px; height:150px; margin:0 auto 22px; border-radius:50%;
+    border:4px solid var(--red); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:var(--red); transform:rotate(-6deg); font-family:'Noto Serif SC';
+    box-shadow:0 0 0 6px rgba(179,39,45,0.08);
+  }
+  .seal-big .score{ font-size:40px; font-weight:900; line-height:1; }
+  .seal-big .of{ font-size:12px; font-weight:600; margin-top:2px; }
+  .result-wrap h2{ font-size:26px; margin-bottom:8px; }
+  .result-wrap p{ color:#7a6a58; font-size:14px; line-height:1.6; }
+  .result-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:22px;
+    margin-top:26px; text-align:left; font-size:14px;
+  }
+  .result-card .row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); }
+  .result-card .row:last-child{ border-bottom:none; }
+  .result-card .row b{ color:var(--red-dark); }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px;
+    box-shadow:0 10px 30px -10px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:.25s; z-index:99;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; font-size:11.5px; color:#a99a89; margin-top:40px; }
+</style>
+</head>
+<body>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login">
+  <div class="login-hero">
+    <div class="login-left">
+      <div>
+        <span class="cn-big">学中文</span>
+        <h1>Mandarinfy</h1>
+        <p>Ujian tata bahasa HSK 2 · Bab 1 sampai Bab 8. Uji pemahamanmu tentang 给/送/发/寄, 才, 得/地/的, 把, 的, dan pola-pola lain lewat 50 soal reading dan 10 soal writing.</p>
+      </div>
+      <div class="stamp-ring">MANDARINFY<br>HSK · 2</div>
+    </div>
+    <div class="login-right">
+      <h2>Mulai Ujian</h2>
+      <div class="sub">Isi data dirimu untuk memulai. Hasil akan otomatis tercatat.</div>
+      <div class="field">
+        <label for="in-nama">Nama Lengkap</label>
+        <input type="text" id="in-nama" placeholder="cth. Siti Aminah">
+      </div>
+      <div class="field">
+        <label for="in-kelas">Kelas</label>
+        <input type="text" id="in-kelas" placeholder="cth. HSK2-A">
+      </div>
+      <div class="err" id="login-err">Nama dan kelas wajib diisi ya.</div>
+      <button class="btn btn-primary" id="btn-start">Mulai Ujian →</button>
+      <div class="login-foot">50 soal reading · 10 soal writing</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EXAM SCREEN ============ -->
+<div id="screen-exam" class="hidden">
+  <div class="topbar">
+    <div class="logo">
+      <div class="seal">中</div>
+      <div class="word">Mandarinfy <span class="cn">学中文</span></div>
+    </div>
+    <div class="userinfo" id="exam-userinfo"></div>
+  </div>
+  <div class="wrap">
+    <div class="exam-head">
+      <h1>Ujian Tata Bahasa HSK 2 <span style="color:var(--red)">· Bab 1–8</span></h1>
+      <div class="meta" id="progress-text">0 dari 60 soal terjawab</div>
+      <div class="progressbar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="quiz-mount"></div>
+
+    <div class="bab-tab">
+      <div class="num" style="background:#B3272D;">✍</div>
+      <div class="title">Bagian Writing<span>Buat kalimat sesuai pola tata bahasa yang diminta. Tidak akan dikoreksi otomatis.</span></div>
+    </div>
+    <div id="writing-mount"></div>
+
+    <div class="submit-zone">
+      <h3>Sudah yakin dengan semua jawaban?</h3>
+      <p>Setelah dikumpulkan, jawaban tidak bisa diubah lagi.</p>
+      <button class="btn btn-primary" id="btn-submit">Kumpulkan Ujian</button>
+    </div>
+    <div class="footer-note">Mandarinfy — dibuat berdasarkan catatan tata bahasa HSK 2, Bab 1–8.</div>
+  </div>
+</div>
+
+<!-- ============ RESULT SCREEN ============ -->
+<div id="screen-result" class="hidden">
+  <div class="topbar">
+    <div class="logo">
+      <div class="seal">中</div>
+      <div class="word">Mandarinfy <span class="cn">学中文</span></div>
+    </div>
+  </div>
+  <div class="result-wrap">
+    <div class="seal-big">
+      <div class="score" id="res-score">0</div>
+      <div class="of">/ 50 BENAR</div>
+    </div>
+    <h2>Ujian selesai, <span id="res-name">-</span>!</h2>
+    <p>Hasil reading dan jawaban writing kamu sudah tercatat di rekap nilai Mandarinfy.</p>
+    <div class="result-card">
+      <div class="row"><span>Nama</span><b id="rc-name">-</b></div>
+      <div class="row"><span>Kelas</span><b id="rc-kelas">-</b></div>
+      <div class="row"><span>Skor Reading</span><b id="rc-score">-</b></div>
+      <div class="row"><span>Soal Writing terjawab</span><b id="rc-writing">-</b></div>
+      <div class="row"><span>Waktu Submit</span><b id="rc-time">-</b></div>
+    </div>
+    <button class="btn btn-ghost" id="btn-back-login" style="margin-top:24px;">Kembali ke Halaman Login</button>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   DATA: 50 soal reading (pilihan ganda) — Bab 1-8
+   ====================================================================== */
+const READING = [
+// ---- BAB 1: 给/送/发/寄, 要, 还是 ----
+{bab:1, q:"老师 ___ 我们作业。", hint:"Guru memberi kita PR.", options:["给","送","发","寄"], answer:"给"},
+{bab:1, q:"我 ___ 你消息，你看一下。", hint:"Aku kirim pesan ke kamu.", options:["寄","给","发","送"], answer:"发"},
+{bab:1, q:"我 ___ 给你一个包裹。", hint:"Aku kirim paket lewat pos ke kamu.", options:["送","发","寄","给"], answer:"寄"},
+{bab:1, q:"他 ___ 给我一本书，作为生日礼物。", hint:"Dia mengantar/memberi hadiah buku ulang tahun.", options:["发","寄","给","送"], answer:"送"},
+{bab:1, q:"你 ___ 多喝水，对身体好。", hint:"Kamu harus minum lebih banyak air.", options:["还是","送","要","寄"], answer:"要"},
+{bab:1, q:"天气不好，我们 ___ 明天再去吧。", hint:"Kita sebaiknya besok saja pergi.", options:["才","要","还是","送"], answer:"还是"},
+
+// ---- BAB 2: 才, S+P jadi predikat, 地 ----
+{bab:2, q:"他十二点 ___ 睡觉。", hint:"Dia baru tidur jam 12 malam — ada rasa telat.", options:["就","才","还","地"], answer:"才"},
+{bab:2, q:"我等了一个小时，他 ___ 来。", hint:"Aku menunggu 1 jam, dia baru datang.", options:["就","才","还","了"], answer:"才"},
+{bab:2, q:"我 ___ 他很聪明。", hint:"Aku pikir dia pintar (opini ringan, santai).", options:["希望","觉得","知道","听说"], answer:"觉得"},
+{bab:2, q:"他 ___ 这个问题很难。", hint:"Dia berpendapat masalah ini sulit (lebih formal).", options:["说","觉得","认为","想"], answer:"认为"},
+{bab:2, q:"老师 ___ 今天没有作业。", hint:"Guru bilang hari ini tidak ada PR.", options:["觉得","希望","说","认为"], answer:"说"},
+{bab:2, q:"他认真 ___ 学习。", hint:"Dia belajar dengan serius — menjelaskan cara.", options:["得","的","地","了"], answer:"地"},
+{bab:2, q:"我 ___ 他不会来了。", hint:"Aku pikir dia tidak akan datang.", options:["说","知道","希望","想"], answer:"想"},
+
+// ---- BAB 3: durasi, reduplikasi verb, 是不是, reduplikasi adjective ----
+{bab:3, q:"我们聊 ___ 三十分钟。", hint:"Kita ngobrol selama 30 menit.", options:["过","了","着","的"], answer:"了"},
+{bab:3, q:"你 ___ 这本书吗？", hint:"Coba lihat dulu buku ini yuk (santai, sebentar).", options:["看了","看看","在看","看着"], answer:"看看"},
+{bab:3, q:"我们 ___ 吧，我有一个好主意。", hint:"Ayo kita diskusi sebentar.", options:["讨论了","在讨论","讨论讨论","讨论着"], answer:"讨论讨论"},
+{bab:3, q:"你 ___ 已经吃饭了？", hint:"Apakah benar kamu sudah makan? (minta konfirmasi)", options:["是吗","不是","是不是","是不"], answer:"是不是"},
+{bab:3, q:"他 ___ 地回家了。", hint:"Dia pulang dengan sangat gembira (reduplikasi kata sifat AABB).", options:["很高兴","高兴","高高兴兴","高兴的"], answer:"高高兴兴"},
+{bab:3, q:"你学汉语学 ___ 多长时间了？", hint:"Sudah berapa lama kamu belajar bahasa Mandarin?", options:["过","了","着","的"], answer:"了"},
+{bab:3, q:"他工作 ___ 十个小时。", hint:"Dia sudah bekerja selama 10 jam (tanpa objek).", options:["过","了","在","着"], answer:"了"},
+
+// ---- BAB 4: 只好, 给(preposisi), pelengkap hasil ----
+{bab:4, q:"没钱了，我 ___ 回家。", hint:"Tidak ada uang, aku terpaksa pulang (tidak ada pilihan lain).", options:["要","应该","只好","得"], answer:"只好"},
+{bab:4, q:"妈妈 ___ 我买了一件衣服。", hint:"Mama membelikan aku baju (preposisi: untuk/kepada).", options:["把","为了","给","送"], answer:"给"},
+{bab:4, q:"我准备 ___ 了，可以走了。", hint:"Aku sudah siap dengan baik, bisa berangkat.", options:["完","上","好","懂"], answer:"好"},
+{bab:4, q:"我写 ___ 作业了，很累。", hint:"Aku sudah selesai total menulis PR.", options:["好","完","上","见"], answer:"完"},
+{bab:4, q:"请把门关 ___。", hint:"Tolong tutup pintu sampai benar-benar tertutup.", options:["下","好","完","上"], answer:"上"},
+{bab:4, q:"老师说的话，我听 ___ 了。", hint:"Aku mengerti apa yang guru katakan.", options:["见","到","完","懂"], answer:"懂"},
+
+// ---- BAB 5: pelengkap hasil lanjutan, 又...又, 多/几 ----
+{bab:5, q:"我找 ___ 工作了！", hint:"Aku berhasil mendapatkan pekerjaan!", options:["在","走","到","满"], answer:"到"},
+{bab:5, q:"书放 ___ 桌子上。", hint:"Buku diletakkan di atas meja (posisi setelah tindakan).", options:["到","走","满","在"], answer:"在"},
+{bab:5, q:"时间 ___ 得很快。", hint:"Waktu berlalu dengan cepat.", options:["在","满","到","走"], answer:"走"},
+{bab:5, q:"杯子装 ___ 了水。", hint:"Gelas terisi penuh air.", options:["在","走","到","满"], answer:"满"},
+{bab:5, q:"这个地方 ___ 大 ___ 漂亮。", hint:"Tempat ini besar dan cantik sekaligus.", options:["也...也","又...又","不...也不","还...还"], answer:"又...又"},
+{bab:5, q:"我们等了 ___ 两个小时。", hint:"Kita menunggu sekitar 1-2 jam (perkiraan angka kecil).", options:["两","几","一","多"], answer:"一"},
+
+// ---- BAB 6: perbandingan, 好吗, 把 ----
+{bab:6, q:"我 ___ 他不一样。", hint:"Aku berbeda dengan dia.", options:["在","给","跟","被"], answer:"跟"},
+{bab:6, q:"他的衣服 ___ 我的一样。", hint:"Bajunya sama dengan bajuku.", options:["给","和","被","在"], answer:"和"},
+{bab:6, q:"我们一起去吃饭，___？", hint:"Kita pergi makan bareng ya, boleh? (minta persetujuan)", options:["是不是","吧","对了","好吗"], answer:"好吗"},
+{bab:6, q:"我 ___ 手机放在床上。", hint:"Aku meletakkan hp di atas kasur.", options:["被","在","给","把"], answer:"把"},
+{bab:6, q:"请 ___ 椅子放在门旁边。", hint:"Tolong letakkan kursi di sebelah pintu.", options:["在","把","给","被"], answer:"把"},
+{bab:6, q:"他 ___ 把作业写完。", hint:"Dia belum menyelesaikan PR (bentuk negatif dengan 把).", options:["不","别","没","都"], answer:"没"},
+
+// ---- BAB 7: 的, 有点儿, 一点儿 ----
+{bab:7, q:"这是我 ___ 书。", hint:"Ini bukuku (kepunyaan).", options:["地","得","的","了"], answer:"的"},
+{bab:7, q:"这个包是我 ___。", hint:"Ini tasku, milikku (的 sebagai pengganti kata benda).", options:["地","得","了","的"], answer:"的"},
+{bab:7, q:"我喜欢你 ___ 的。", hint:"Aku suka yang kamu beli (kata kerja + 的 jadi frasa benda).", options:["买了","在买","买","买着"], answer:"买"},
+{bab:7, q:"我喜欢 ___ 的，不喜欢小的。", hint:"Aku suka yang besar (kata sifat + 的).", options:["很大","大了","大","大的的"], answer:"大"},
+{bab:7, q:"今天有点儿 ___。", hint:"Hari ini agak dingin (keluhan ringan).", options:["很冷","冷了","冷","太冷"], answer:"冷"},
+{bab:7, q:"便宜 ___，可以吗？", hint:"Lebih murah sedikit ya, boleh? (permintaan sopan)", options:["有点儿","一下","一点儿","一遍"], answer:"一点儿"},
+
+// ---- BAB 8: 左右, 才(penekanan), 差不多, 还可以, 了 ----
+{bab:8, q:"我们班有十个人 ___。", hint:"Kelas kami ada sekitar 10 orang (perkiraan netral).", options:["多","几","左右","差不多"], answer:"左右"},
+{bab:8, q:"这个地方 ___ 漂亮！", hint:"Tempat ini benar-benar cantik! (penekanan)", options:["左右","还","差不多","才"], answer:"才"},
+{bab:8, q:"我 ___ 好了，还没吃饭。", hint:"Aku hampir selesai (masih sedikit lagi).", options:["左右","才","还","差不多"], answer:"差不多"},
+{bab:8, q:"这个菜 ___，不是很好吃。", hint:"Makanan ini lumayan, bukan sangat enak.", options:["不错","一般","还可以","差不多"], answer:"还可以"},
+{bab:8, q:"天冷 ___，我们快点走吧。", hint:"Cuacanya sudah jadi dingin, ayo cepat jalan (perubahan keadaan).", options:["过","着","了","的"], answer:"了"},
+{bab:8, q:"这个不好，那个 ___ 好。", hint:"Ini tidak bagus, yang itu justru bagus (penegasan perbandingan).", options:["左右","还","差不多","才"], answer:"才"},
+];
+
+/* ======================================================================
+   DATA: 10 soal writing — Bab 1-8
+   ====================================================================== */
+const WRITING = [
+  {bab:1, prompt:"Gunakan pola \"S + 给 + orang + V + benda\" untuk menulis: \"Aku memberi kamu kopi.\""},
+  {bab:2, prompt:"Gunakan kata \"才\" untuk menulis: \"Dia baru tidur jam 12 malam.\""},
+  {bab:3, prompt:"Gunakan pola durasi \"S + V + 了 + durasi\" untuk menulis: \"Aku menunggu kamu setengah jam.\""},
+  {bab:3, prompt:"Gunakan reduplikasi kata kerja (pola AA) untuk menulis: \"Aku mau coba lihat baju ini dulu.\""},
+  {bab:4, prompt:"Gunakan kata \"只好\" untuk menulis: \"Karena hujan, aku terpaksa naik taksi.\""},
+  {bab:4, prompt:"Gunakan pelengkap hasil \"完\" untuk menulis: \"Aku sudah selesai menulis PR.\""},
+  {bab:5, prompt:"Gunakan pola \"又...又...\" untuk menulis: \"Cuaca ini panas dan lembab.\""},
+  {bab:6, prompt:"Gunakan pola \"跟...一样\" untuk menulis: \"Bajunya sama dengan bajuku.\""},
+  {bab:6, prompt:"Gunakan kata \"把\" untuk menulis: \"Tolong letakkan kunci di atas meja.\""},
+  {bab:7, prompt:"Gunakan kata \"有点儿\" untuk menulis: \"Aku agak lapar.\""},
+];
+
+const BAB_COLORS = {1:"#F5A3A8",2:"#F2A65A",3:"#F2C744",4:"#8FC18C",5:"#7FC2C7",6:"#7C9FE0",7:"#B48AD6",8:"#E38FBE"};
+const BAB_TITLES = {
+  1:"给 / 送 / 发 / 寄, 要, 还是",
+  2:"才, S+Predikat kecil, 地",
+  3:"Durasi, reduplikasi kata kerja & sifat, 是不是",
+  4:"只好, 给 (preposisi), pelengkap hasil",
+  5:"Pelengkap hasil lanjutan, 又...又, 多/几",
+  6:"Perbandingan 跟/和, ...好吗, 把",
+  7:"的, 有点儿, 一点儿",
+  8:"左右, 才 (penekanan), 差不多, 还可以, 了",
+};
+
+/* ======================================================================
+   KONFIGURASI BACKEND
+   Tempel URL Web App Google Apps Script kamu di sini (diakhiri /exec).
+   Lihat Code.gs untuk cara membuatnya.
+   ====================================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbx4jOA-D0n2auj42W6yhfcF6glIMDzxoZ3-31it6u5uoRzsxfMzsHiKNhsSJtNptCqs/exec";
+
+/* ======================================================================
+   STATE & UTILS
+   ====================================================================== */
+let USER = {nama:"", kelas:""};
+let shuffledReading = [];
+let userReadingAnswers = {};   // index -> chosen text
+let userWritingAnswers = {};   // index -> text
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function showScreen(id){
+  ["screen-login","screen-exam","screen-result"].forEach(s=>{
+    document.getElementById(s).classList.toggle("hidden", s!==id);
+  });
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+/* ======================================================================
+   LOGIN
+   ====================================================================== */
+document.getElementById("btn-start").addEventListener("click", ()=>{
+  const nama = document.getElementById("in-nama").value.trim();
+  const kelas = document.getElementById("in-kelas").value.trim();
+  const err = document.getElementById("login-err");
+  if(!nama || !kelas){
+    err.style.display = "block";
+    return;
+  }
+  err.style.display = "none";
+  USER = {nama, kelas};
+  document.getElementById("exam-userinfo").innerHTML = `<b>${escapeHtml(nama)}</b> · ${escapeHtml(kelas)}`;
+  buildExam();
+  showScreen("screen-exam");
+});
+
+document.getElementById("btn-back-login").addEventListener("click", ()=>{
+  document.getElementById("in-nama").value="";
+  document.getElementById("in-kelas").value="";
+  showScreen("screen-login");
+});
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ======================================================================
+   BUILD EXAM
+   ====================================================================== */
+function buildExam(){
+  userReadingAnswers = {};
+  userWritingAnswers = {};
+  shuffledReading = READING.map((item, idx) => ({
+    ...item,
+    idx,
+    shuffledOptions: shuffle(item.options)
+  }));
+
+  const mount = document.getElementById("quiz-mount");
+  mount.innerHTML = "";
+  let lastBab = null;
+
+  shuffledReading.forEach((item, i) => {
+    if(item.bab !== lastBab){
+      lastBab = item.bab;
+      const tab = document.createElement("div");
+      tab.className = "bab-tab";
+      tab.innerHTML = `<div class="num" style="background:${BAB_COLORS[item.bab]};">${item.bab}</div>
+        <div class="title">Bab ${item.bab} <span>${BAB_TITLES[item.bab]}</span></div>`;
+      mount.appendChild(tab);
+    }
+    const card = document.createElement("div");
+    card.className = "qcard";
+    card.innerHTML = `
+      <div class="qhead">
+        <div class="qnum">${i+1}.</div>
+        <div class="qtext">${item.q}<span class="hint">${item.hint}</span></div>
+      </div>
+      <div class="opts">
+        ${item.shuffledOptions.map(opt => `
+          <label class="opt" data-idx="${item.idx}" data-val="${escapeHtml(opt)}">
+            <input type="radio" name="q${item.idx}" value="${escapeHtml(opt)}">
+            <span>${opt}</span>
+          </label>`).join("")}
+      </div>
+    `;
+    mount.appendChild(card);
+  });
+
+  mount.querySelectorAll(".opt").forEach(label => {
+    label.addEventListener("click", () => {
+      const idx = label.getAttribute("data-idx");
+      const val = label.getAttribute("data-val");
+      userReadingAnswers[idx] = val;
+      document.querySelectorAll(`.opt[data-idx="${idx}"]`).forEach(l => l.classList.remove("selected"));
+      label.classList.add("selected");
+      label.querySelector("input").checked = true;
+      updateProgress();
+    });
+  });
+
+  const wmount = document.getElementById("writing-mount");
+  wmount.innerHTML = "";
+  WRITING.forEach((item, i) => {
+    const card = document.createElement("div");
+    card.className = "qcard writing-card";
+    card.innerHTML = `
+      <div class="qhead">
+        <div class="qnum">W${i+1}.</div>
+        <div class="qtext">${item.prompt}<span class="hint">Bab ${item.bab} · ${BAB_TITLES[item.bab]}</span></div>
+      </div>
+      <textarea placeholder="Tulis jawabanmu dalam bahasa Mandarin di sini…" data-widx="${i}"></textarea>
+    `;
+    wmount.appendChild(card);
+  });
+  wmount.querySelectorAll("textarea").forEach(ta => {
+    ta.addEventListener("input", () => {
+      userWritingAnswers[ta.getAttribute("data-widx")] = ta.value;
+      updateProgress();
+    });
+  });
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = READING.length + WRITING.length;
+  const done = Object.keys(userReadingAnswers).length + Object.values(userWritingAnswers).filter(v=>v && v.trim()!== "").length;
+  document.getElementById("progress-text").textContent = `${done} dari ${total} soal terjawab`;
+  document.getElementById("progress-fill").style.width = `${(done/total)*100}%`;
+}
+
+/* ======================================================================
+   SUBMIT
+   ====================================================================== */
+document.getElementById("btn-submit").addEventListener("click", async () => {
+  const answeredReading = Object.keys(userReadingAnswers).length;
+  if(answeredReading < READING.length){
+    if(!confirm(`Baru ${answeredReading} dari ${READING.length} soal reading yang dijawab. Tetap kumpulkan?`)) return;
+  }
+
+  let score = 0;
+  shuffledReading.forEach(item => {
+    if(userReadingAnswers[item.idx] === item.answer) score++;
+  });
+
+  const writingList = WRITING.map((item, i) => ({
+    bab: item.bab,
+    prompt: item.prompt,
+    jawaban: userWritingAnswers[i] || ""
+  }));
+
+  const submission = {
+    nama: USER.nama,
+    kelas: USER.kelas,
+    skorReading: score,
+    totalReading: READING.length,
+    writing: writingList,
+    waktu: new Date().toISOString()
+  };
+
+  document.getElementById("btn-submit").disabled = true;
+  document.getElementById("btn-submit").textContent = "Mengirim…";
+
+  try{
+    if(!API_URL || API_URL.includes("PASTE_URL")){
+      throw new Error("API_URL belum diisi");
+    }
+    // dikirim sebagai text/plain supaya tidak kena preflight CORS di Apps Script
+    await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(submission)
+    });
+    toast("Jawaban berhasil dikumpulkan!");
+  }catch(e){
+    console.error("Gagal mengirim ke backend:", e);
+    toast("Gagal mengirim ke server. Cek koneksi internet / konfigurasi API_URL.");
+  }
+
+  document.getElementById("res-score").textContent = score;
+  document.getElementById("res-name").textContent = USER.nama;
+  document.getElementById("rc-name").textContent = USER.nama;
+  document.getElementById("rc-kelas").textContent = USER.kelas;
+  document.getElementById("rc-score").textContent = `${score} / ${READING.length}`;
+  document.getElementById("rc-writing").textContent = `${writingList.filter(w=>w.jawaban.trim()!=="").length} / ${WRITING.length}`;
+  document.getElementById("rc-time").textContent = new Date().toLocaleString("id-ID");
+
+  showScreen("screen-result");
+});
+
+</script>
+</body>
+</html>
