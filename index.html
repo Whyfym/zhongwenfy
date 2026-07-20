@@ -385,11 +385,12 @@ const BAB_TITLES = {
    Tempel URL Web App Google Apps Script kamu di sini (diakhiri /exec).
    Lihat Code.gs untuk cara membuatnya.
    ====================================================================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4jOA-D0n2auj42W6yhfcF6glIMDzxoZ3-31it6u5uoRzsxfMzsHiKNhsSJtNptCqs/exec";
+const API_URL = "PASTE_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
 
 /* ======================================================================
    STATE & UTILS
    ====================================================================== */
+const STORAGE_KEY = "mandarinfy_session_v1";
 let USER = {nama:"", kelas:""};
 let shuffledReading = [];
 let userReadingAnswers = {};   // index -> chosen text
@@ -444,6 +445,64 @@ document.getElementById("btn-back-login").addEventListener("click", ()=>{
 
 function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ======================================================================
+   PERSISTENSI SESI (supaya refresh tidak mengulang dari awal)
+   ====================================================================== */
+function saveActiveSession(){
+  const payload = {
+    submitted: false,
+    user: USER,
+    shuffledReading,
+    readingAnswers: userReadingAnswers,
+    writingAnswers: userWritingAnswers
+  };
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }catch(e){ /* storage penuh / tidak tersedia, abaikan */ }
+}
+
+function saveSubmittedSession(result){
+  const payload = { submitted: true, result };
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }catch(e){ /* abaikan */ }
+}
+
+function clearSession(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){ /* abaikan */ }
+}
+
+function fillResultScreen(result){
+  document.getElementById("res-score").textContent = result.score;
+  document.getElementById("res-name").textContent = result.nama;
+  document.getElementById("rc-name").textContent = result.nama;
+  document.getElementById("rc-kelas").textContent = result.kelas;
+  document.getElementById("rc-score").textContent = `${result.score} / ${result.total}`;
+  document.getElementById("rc-writing").textContent = `${result.writingAnswered} / ${result.writingTotal}`;
+  document.getElementById("rc-time").textContent = new Date(result.waktu).toLocaleString("id-ID");
+}
+
+function tryRestoreSession(){
+  let raw;
+  try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ return; }
+  if(!raw) return;
+  let data;
+  try{ data = JSON.parse(raw); }catch(e){ clearSession(); return; }
+
+  if(data.submitted && data.result){
+    fillResultScreen(data.result);
+    showScreen("screen-result");
+    return;
+  }
+
+  if(data.user && data.shuffledReading){
+    USER = data.user;
+    shuffledReading = data.shuffledReading;
+    userReadingAnswers = data.readingAnswers || {};
+    userWritingAnswers = data.writingAnswers || {};
+    document.getElementById("exam-userinfo").innerHTML = `<b>${escapeHtml(USER.nama)}</b> · ${escapeHtml(USER.kelas)}`;
+    renderExamDOM();
+    showScreen("screen-exam");
+    toast("Ujianmu dilanjutkan dari progres terakhir.");
+  }
 }
 
 /* ======================================================================
@@ -565,8 +624,8 @@ document.getElementById("btn-submit").addEventListener("click", async () => {
   document.getElementById("btn-submit").textContent = "Mengirim…";
 
   try{
-    if(!API_URL || API_URL.includes("PASTE_URL")){
-      throw new Error("API_URL belum diisi");
+    if(!API_URL || API_URL.includes("https://script.google.com/macros/s/AKfycbzQ_l-QAckvGxqWzPs9dq5m0JyTw2TeWZuFg2QIUhMI3Fa3MqDT8-5eYVGMGmrZUfeT/exec")){
+      throw new Error("https://script.google.com/macros/s/AKfycbzQ_l-QAckvGxqWzPs9dq5m0JyTw2TeWZuFg2QIUhMI3Fa3MqDT8-5eYVGMGmrZUfeT/exec");
     }
     // dikirim sebagai text/plain supaya tidak kena preflight CORS di Apps Script
     await fetch(API_URL, {
