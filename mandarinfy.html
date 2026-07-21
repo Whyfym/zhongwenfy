@@ -135,7 +135,7 @@
       <div>
         <span class="cn-big">期中考试</span>
         <h1>Mandarinfy</h1>
-        <p>Ujian Midterm HSK 2. 25 soal: 10 soal Translate (打字) dan 15 soal Susun Hanzi. Urutan soal diacak untuk setiap peserta.</p>
+        <p>Ujian Midterm HSK 2. 25 soal: Bagian I Translate (10 soal) dan Bagian II Susun Hanzi (15 soal). Urutan soal diacak di dalam setiap sesi.</p>
       </div>
       <div class="stamp-ring">MANDARINFY<br>MIDTERM</div>
     </div>
@@ -152,7 +152,7 @@
       </div>
       <div class="err" id="login-err">Nama dan kelas wajib diisi ya.</div>
       <button class="btn btn-primary" id="btn-start">Mulai Ujian →</button>
-      <div class="login-foot">10 soal translate (打字) · 15 soal susun hanzi</div>
+      <div class="login-foot">10 soal translate · 15 soal susun hanzi</div>
     </div>
   </div>
 </div>
@@ -196,7 +196,7 @@
     <div class="result-card">
       <div class="row"><span>Nama</span><b id="rc-name">-</b></div>
       <div class="row"><span>Kelas</span><b id="rc-kelas">-</b></div>
-      <div class="row"><span>Skor Translate (打字)</span><b id="rc-typing">-</b></div>
+      <div class="row"><span>Skor Translate</span><b id="rc-typing">-</b></div>
       <div class="row"><span>Skor Susun Hanzi</span><b id="rc-hanzi">-</b></div>
       <div class="row"><span>Total Gabungan</span><b id="rc-total">-</b></div>
       <div class="row"><span>Waktu Submit</span><b id="rc-time">-</b></div>
@@ -224,73 +224,87 @@ function normalizeText(s){
 }
 
 /* ======================================================================
-   DATA: 10 soal Translate / Mengetik (打字) — Bab 1-8
-   accepted: daftar kemungkinan jawaban benar (variasi grammar berbeda,
-   makna & konteks tetap sama)
+   DATA: 10 soal Translate (SOURCE: Word File)
+   Kunci jawaban dibuat variatif berdasarkan grammar HSK 2.
    ====================================================================== */
-const TYPING = [
-  { bab:1, prompt:"Terjemahkan: \"Sebaiknya kamu ikut acara pernikahan kerabatmu.\"",
-    accepted:["你还是参加你亲戚的婚礼吧","你还是去参加你亲戚的婚礼吧","你还是去你亲戚的婚礼吧","你还是参加你的亲戚的婚礼吧"] },
-  { bab:1, prompt:"Terjemahkan: \"Kamu bisa menjual baju, juga bisa menjual sepatu.\"",
-    accepted:["你可以卖衣服，也可以卖鞋子","你可以卖衣服也可以卖鞋子","你可以卖衣服，也可以卖鞋","你可以卖衣服，也可以卖鞋子。"] },
-  { bab:2, prompt:"Terjemahkan: \"Saya sudah menunggu 1 jam, tapi dia baru datang.\"",
-    accepted:["我等了一个小时，他才来","我已经等了一个小时，他才来","我等了一个小时,他才来","我等了一个小时他才来"] },
-  { bab:4, prompt:"Terjemahkan: \"Sepatu ini terlalu kecil, aku terpaksa harus menukarnya.\"",
-    accepted:["这双鞋太小了，我只好换","这双鞋太小了，我只好去换","这双鞋子太小了，我只好换","这双鞋太小了我只好换"] },
-  { bab:5, prompt:"Terjemahkan: \"Program ini bagus, juga sangat menarik.\"",
-    accepted:["这个节目又好又有意思","这个节目又好看又有意思","这个节目又好又有趣","这个节目又好又有意思。"] },
-  { bab:5, prompt:"Terjemahkan: \"Toko roti ini membutuhkan sekitar 4 sampai 5 karyawan.\"",
-    accepted:["这个面包店需要四五个员工","这家面包店需要四五个员工","这个面包店需要四五个工作人员","这个面包店大概需要四五个员工"] },
-  { bab:6, prompt:"Terjemahkan: \"Metode belajar saya dan dia tidak sama.\"",
+const TYPING_SRC = [
+  { prompt:"Sebaiknya ikut acara pernikahan kerabatmu",
+    accepted:["你还是参加你亲戚的婚礼吧","你还是去参加你亲戚的婚礼吧","你还是去你亲戚的婚礼吧","你最好参加你亲戚的婚礼"] },
+  { prompt:"Kamu bisa menjual kosmetik juga bisa menjual kebutuhan sehari hari",
+    accepted:["你可以卖化妆品，也可以卖日用品","你可以卖化妆品也可以卖日用品","你可以卖化妆品，也可以卖生活用品"] },
+  { prompt:"Saya sudah menungguh 1 jam,tapi dia baru datang",
+    accepted:["我等了一个小时，他才来","我已经等了一个小时，他才来","我等了一个小时他才来"] },
+  { prompt:"Baju ini sangat ketat terpaksa saya harus mengembalikan",
+    accepted:["这件衣服太紧了，我只好退","这件衣服很紧，我只好退回","这件衣服太紧了，我只好退货"] },
+  { prompt:"Program ini bagus juga sangat menarik",
+    accepted:["这个节目又好又有意思","这个节目又好看又有意思","这个节目又好又有趣"] },
+  { prompt:"Restoran cepat saji ini membutuhkan pelayan sekitar 6 sampai 7 orang",
+    accepted:["这家快餐店需要六七个服务员","这个快餐店需要六七个服务员","这家快餐店大概需要六七个服务员"] },
+  { prompt:"Metode belajar saya dan dia tidak sama",
     accepted:["我的学习方法跟他的不一样","我的学习方法和他的不一样","我跟他的学习方法不一样","我和他的学习方法不一样"] },
-  { bab:6, prompt:"Terjemahkan: \"Tolong kamu letakkan botol air minum di dalam tas sekolah.\"",
-    accepted:["请你把水瓶放在书包里","你把水瓶放在书包里","请把水瓶放进书包里","请你把水瓶放到书包里"] },
-  { bab:7, prompt:"Terjemahkan: \"Baju atasan itu longgar, jadi saya sedikit marah.\"",
-    accepted:["那件上衣有点儿宽松，所以我有点儿生气","那件上衣有点宽松，所以我有点儿生气","那件上衣有点儿肥，所以我有点儿生气","那件上衣有点儿宽松,所以我有点儿生气"] },
-  { bab:1, prompt:"Terjemahkan: \"Lusa aku ada ujian bahasa Inggris, jadi hari ini harus belajar bahasa Inggris.\"",
-    accepted:["后天我有英语考试，所以今天要学习英语","后天我有英语考试，所以今天得学英语","后天我有英语考试，今天要学习英语","后天我有英语考试所以今天要学习英语"] }
+  { prompt:"Kamu letakan kotak makan siang dalam tas ransel",
+    accepted:["你把午餐盒放在双肩包里","你把午餐盒放进双肩包里","你把饭盒放在书包里"] },
+  { prompt:"Baju atasan itu longgar,jadi saya sedikit marah",
+    accepted:["那件上衣很宽松，所以我有点儿生气","那件上衣点儿肥，所以我有点儿生气","那件上衣很宽松所以我有点生气"] },
+  { prompt:"Besok saya ada ujian mandarin jadi hari ini harus belajar mandarin",
+    accepted:["明天我有汉语考试，所以今天要学习汉语","明天我有中文考试，所以今天得学中文","明天我有汉语考试所以今天要学习汉语"] }
 ];
 
 /* ======================================================================
-   DATA: 15 soal Susun Hanzi — Bab 1-8
-   acceptedOrders: array of array (bisa lebih dari satu urutan benar)
+   DATA: 15 soal Susun Hanzi (SOURCE: Word File)
+   Tiles disesuaikan agar menjadi Hanzi yang benar/standar jika ada typo di sumber.
    ====================================================================== */
-const HANZI = [
-  { bab:1, meaning:"Pak itu memberikan aku seikat bunga.", tiles:["先生","送给","我","一束","花"],
-    acceptedOrders:[["先生","送给","我","一束","花"]] },
-  { bab:1, meaning:"Pengucapanku selalu tidak bagus, sebaiknya bagaimana ya?", tiles:["我的","发音","总是","不好","应该","怎么办"],
-    acceptedOrders:[["我的","发音","总是","不好","应该","怎么办"]] },
-  { bab:2, meaning:"Menurutmu apakah bahasa Mandarin kita ada kemajuan?", tiles:["你","觉得","咱们","汉语","有","进步","吗"],
+const HANZI_SRC = [
+  { meaning:"一束 - 先生 - 给 - 花 - 送 - 我 -张", 
+    tiles:["张","先生","送给","我","一束","花"], // Perbaikan: "送","张" digabung/disesuaikan konteks. Asumsi target: 张先生送给我一束花
+    acceptedOrders:[["张","先生","送给","我","一束","花"]] },
+  { meaning:"声调 - 不好 - 我的 - 应该 - 总是 - 呢？- 怎么办", 
+    tiles:["我的","声调","总是","不好","应该","怎么办","呢"],
+    acceptedOrders:[["我的","声调","总是","不好","应该","怎么办","呢"]] },
+  { meaning:"吗？- 觉得 - 进步- 咱们 - 你 - 有 - 汉语", 
+    tiles:["你","觉得","咱们","汉语","有","进步","吗"],
     acceptedOrders:[["你","觉得","咱们","汉语","有","进步","吗"]] },
-  { bab:3, meaning:"Ayah sekarang setiap hari kerja minimal dua jam.", tiles:["爸爸","现在","每天","最少","工作","两个","小时"],
+  { meaning:"妈妈 - 小时 - 网 - 两个 - 每天 - 最少 - 现在", 
+    tiles:["妈妈","现在","每天","最少","上网","两个","小时"], // Perbaikan: "网" menjadi "上网" agar masuk akal
     acceptedOrders:[
-      ["爸爸","现在","每天","最少","工作","两个","小时"],
-      ["现在","爸爸","每天","最少","工作","两个","小时"]
+      ["妈妈","现在","每天","最少","上网","两个","小时"],
+      ["现在","妈妈","每天","最少","上网","两个","小时"]
     ] },
-  { bab:2, meaning:"Katanya kamu kemarin nonton TV sampai sangat larut.", tiles:["听说","你","昨天","很晚","才","看","电视"],
-    acceptedOrders:[["听说","你","昨天","很晚","才","看","电视"]] },
-  { bab:4, meaning:"Di luar sangat dingin, kamu harus pakai topi.", tiles:["外边","很冷","你","一定要","戴上","帽子"],
+  { meaning:"看到 - 听说 - 每天 - 很 - 看 - 你- 晚 -电视", 
+    tiles:["听说","你","每天","看","电视","看","到","很","晚"], // Perbaikan struktur: 听说你每天看电视看到很晚
+    acceptedOrders:[["听说","你","每天","看","电视","看","到","很","晚"]] },
+  { meaning:"外边 - 一定 - 戴上 - 很 - 要 - 帽子 - 冷", 
+    tiles:["外边","很冷","你","一定要","戴上","帽子"], // Asumsi ada kata "你" yang hilang di prompt
     acceptedOrders:[["外边","很冷","你","一定要","戴上","帽子"]] },
-  { bab:7, meaning:"Ohya, aku mau pesan delivery di restoran cepat saji terkenal itu.", tiles:["对了","我要","在","那家","有名的","快餐店","点外卖"],
-    acceptedOrders:[["对了","我要","在","那家","有名的","快餐店","点外卖"]] },
-  { bab:6, meaning:"Kita berbagi rata sepuluh orang, boleh?", tiles:["咱们","十个人","AA制","好吗"],
-    acceptedOrders:[["咱们","十个人","AA制","好吗"]] },
-  { bab:6, meaning:"Aku meletakkan tas di sebelah meja.", tiles:["我","把","书包","放在","桌子","旁边"],
-    acceptedOrders:[["我","把","书包","放在","桌子","旁边"]] },
-  { bab:2, meaning:"Adik perempuan belajar dengan giat setiap hari.", tiles:["妹妹","每天","努力地","学习"],
+  { meaning:"比萨并 - 对了 - 外卖 - 我 - 在 - 有名 - 要 - 快餐店 -的", 
+    tiles:["对了","我要","在","那家","有名的","快餐店","点","比萨饼","外卖"], // Perbaikan: "比萨并" -> "比萨饼", Tambah kata bantu agar valid
+    acceptedOrders:[["对了","我要","在","那家","有名的","快餐店","点","比萨饼","外卖"]] },
+  { meaning:"AA制 - 好吗？- 人 - 咱们 - 十 个", 
+    tiles:["咱们","十个","人","AA制","好吗"], // Perbaikan: "十 个" -> "十个"
+    acceptedOrders:[["咱们","十个","人","AA制","好吗"]] },
+  { meaning:"把 - 桌子 - 袋子 - 我 - 旁边 - 在 - 上 - 放 -的", 
+    tiles:["我","把","袋子","放在","桌子","旁边"], // Perbaikan: disesuaikan grammar 把
+    acceptedOrders:[["我","把","袋子","放在","桌子","旁边"]] },
+  { meaning:"地 - 努力 - 妹妹 - 学习 - 每天", 
+    tiles:["妹妹","每天","努力地","学习"],
     acceptedOrders:[
       ["妹妹","每天","努力地","学习"],
       ["每天","妹妹","努力地","学习"]
     ] },
-  { bab:3, meaning:"Apakah kamu sering melihat berita?", tiles:["你","是不是","常常","看","新闻"],
-    acceptedOrders:[["你","是不是","常常","看","新闻"]] },
-  { bab:5, meaning:"Ibu membawa pergi dompetku.", tiles:["妈妈","带走","了","我的","钱包"],
+  { meaning:"常 - 是 不是 - 新闻 - 在 -看- 邮件", 
+    tiles:["你","是不是","常常","在","看","新闻","邮件"], // Perbaikan: Tambah subjek, gabung 常->常常
+    acceptedOrders:[["你","是不是","常常","在","看","新闻","邮件"]] },
+  { meaning:"带坐 - 妈妈 - 了- 的 - 我 - 钱包", 
+    tiles:["妈妈","带走","了","我的","钱包"], // Perbaikan: "带坐" -> "带走"
     acceptedOrders:[["妈妈","带走","了","我的","钱包"]] },
-  { bab:7, meaning:"Bisakah kamu bantu tukarkan yang agak pendek?", tiles:["你","能不能","帮我","换","一件","短点儿的"],
+  { meaning:"能不能 - 点儿 - 你 - 一件 - 短 - 帮 - 的 - 换", 
+    tiles:["你","能不能","帮我","换","一件","短点儿的"], // Gabung tiles agar grammar benar
     acceptedOrders:[["你","能不能","帮我","换","一件","短点儿的"]] },
-  { bab:8, meaning:"Jaket kapas itu sekitar tiga ratus yuan.", tiles:["那件","棉衣","差不多","三百","块钱"],
+  { meaning:"差不多 - 那 - 棉衣- 长 - 件 - 三", 
+    tiles:["那件","棉衣","差不多","三百","块钱"], // Perbaikan total: "长","三" tidak nyambung. Disesuaikan ke kalimat standar HSK2 Bab 8
     acceptedOrders:[["那件","棉衣","差不多","三百","块钱"]] },
-  { bab:1, meaning:"Dia membawakan aku banyak sekali makanan enak.", tiles:["她","给","我","带了","很多","好吃的"],
+  { meaning:"她 - 好- 带 - 给 - 了 - 很多- 吃的 -我", 
+    tiles:["她","给","我","带了","很多","好吃的"],
     acceptedOrders:[
       ["她","给","我","带了","很多","好吃的"],
       ["她","带了","很多","好吃的","给","我"]
@@ -298,41 +312,19 @@ const HANZI = [
 ];
 
 /* ======================================================================
-   GABUNGKAN & BERI TIPE
+   KONFIGURASI BACKEND (Ganti dengan URL web app Google Apps Script Anda)
    ====================================================================== */
-const ALL_QUESTIONS_BASE = [
-  ...TYPING.map((item, i) => ({ type:"typing", origIndex:i, ...item })),
-  ...HANZI.map((item, i) => ({ type:"hanzi", origIndex:i, ...item }))
-];
-const TOTAL_TYPING = TYPING.length;   // 10
-const TOTAL_HANZI = HANZI.length;     // 15
-const TOTAL_SOAL = TOTAL_TYPING + TOTAL_HANZI; // 25
-
-const BAB_TITLES = {
-  1:"给 / 送 / 发 / 寄, 要, 还是",
-  2:"才, S+Predikat kecil, 地",
-  3:"Durasi, reduplikasi, 是不是",
-  4:"只好, 给 (preposisi), pelengkap hasil",
-  5:"Pelengkap hasil lanjutan, 又...又, 多/几",
-  6:"Perbandingan 跟/和, ...好吗, 把",
-  7:"的, 有点儿, 一点儿",
-  8:"左右, 才 (penekanan), 差不多, 还可以, 了",
-};
-
-/* ======================================================================
-   KONFIGURASI BACKEND
-   ====================================================================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbzE2lGgx4EnMk76w69oIJm98riqBgVowMOrJXw-F0R3QPxK6Roh3aq2fRF9xbDNWYshXQ/exec";
+const API_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
 /* ======================================================================
    STATE & UTILS
    ====================================================================== */
-const STORAGE_KEY = "mandarinfy_midterm_session_v1";
+const STORAGE_KEY = "mandarinfy_midterm_v2_session";
 
 let USER = {nama:"", kelas:""};
-let examQuestions = [];       // urutan teracak untuk sesi ini (referensi ke ALL_QUESTIONS_BASE)
-let userTypingAnswers = {};   // key: soal index dalam examQuestions -> text
-let hanziState = {};          // key: soal index dalam examQuestions -> {tiles, assembled}
+let examQuestions = [];       // Urutan final (Sesi 1 teracak, lalu Sesi 2 teracak)
+let userTypingAnswers = {};   // key: id soal -> text
+let hanziState = {};          // key: id soal -> {tiles, assembled}
 
 function shuffle(arr){
   const a = arr.slice();
@@ -358,27 +350,21 @@ function toast(msg){
 }
 
 function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  return String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
 /* ======================================================================
-   PERSISTENSI SESI (supaya refresh tidak mengulang dari awal)
+   SESSION PERSISTENCE
    ====================================================================== */
 function saveActiveSession(){
-  const payload = {
-    submitted: false,
-    user: USER,
-    examQuestions,
-    typingAnswers: userTypingAnswers,
-    hanziState
-  };
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }catch(e){ /* abaikan */ }
+  const payload = { submitted: false, user: USER, examQuestions, typingAnswers: userTypingAnswers, hanziState };
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }catch(e){}
 }
 function saveSubmittedSession(result){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ submitted:true, result })); }catch(e){ /* abaikan */ }
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ submitted:true, result })); }catch(e){}
 }
 function clearSession(){
-  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){ /* abaikan */ }
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
 }
 
 function tryRestoreSession(){
@@ -401,7 +387,7 @@ function tryRestoreSession(){
     document.getElementById("exam-userinfo").innerHTML = `<b>${escapeHtml(USER.nama)}</b> · ${escapeHtml(USER.kelas)}`;
     renderExamDOM();
     showScreen("screen-exam");
-    toast("Ujianmu dilanjutkan dari progres terakhir.");
+    toast("Ujianmu dilanjutkan.");
   }
 }
 
@@ -422,21 +408,34 @@ document.getElementById("btn-start").addEventListener("click", ()=>{
 
 document.getElementById("btn-back-login").addEventListener("click", ()=>{
   clearSession();
-  document.getElementById("in-nama").value="";
-  document.getElementById("in-kelas").value="";
-  showScreen("screen-login");
+  location.reload();
 });
 
 /* ======================================================================
-   BUILD & RENDER EXAM
+   BUILD & RENDER EXAM (Core Logic Update)
    ====================================================================== */
 function buildFreshExam(){
   userTypingAnswers = {};
   hanziState = {};
-  examQuestions = shuffle(ALL_QUESTIONS_BASE);
-  examQuestions.forEach((q, i) => {
-    if(q.type === "hanzi"){ hanziState[i] = { tiles: shuffle(q.tiles), assembled: [] }; }
+  
+  // 1. Beri ID unik dan tipe
+  const typingBase = TYPING_SRC.map((q, i) => ({ ...q, type:'typing', id: `t${i}` }));
+  const hanziBase = HANZI_SRC.map((q, i) => ({ ...q, type:'hanzi', id: `h${i}` }));
+
+  // 2. Acak INTERNAL masing-masing sesi
+  const shuffledTyping = shuffle(typingBase);
+  const shuffledHanzi = shuffle(hanziBase);
+
+  // 3. Gabungkan: Sesi 1 selalu duluan, Sesi 2 belakangan
+  examQuestions = [...shuffledTyping, ...shuffledHanzi];
+
+  // Initialize Hanzi state (acak tiles)
+  examQuestions.forEach((q) => {
+    if(q.type === "hanzi"){ 
+      hanziState[q.id] = { tiles: shuffle(q.tiles), assembled: [] }; 
+    }
   });
+
   renderExamDOM();
   saveActiveSession();
 }
@@ -444,41 +443,61 @@ function buildFreshExam(){
 function renderExamDOM(){
   const mount = document.getElementById("quiz-mount");
   mount.innerHTML = "";
+  
+  // Penanda Sesi
+  let typingHeaderAdded = false;
+  let hanziHeaderAdded = false;
+
   examQuestions.forEach((q, i) => {
     const no = i + 1;
     const card = document.createElement("div");
     card.className = "qcard writing-card";
+
     if(q.type === "typing"){
+      if(!typingHeaderAdded){
+        const h = document.createElement('h2');
+        h.style = "margin: 20px 0 15px 5px; color:var(--ok); font-size:18px;";
+        h.textContent = "Bagian I: Menerjemahkan (10 Soal)";
+        mount.appendChild(h);
+        typingHeaderAdded = true;
+      }
       card.innerHTML = `
         <div class="qhead">
           <div class="qnum">${no}.</div>
           <span class="type-badge tp">打字 · Translate</span>
         </div>
-        <div class="qtext">${q.prompt}<span class="hint">Bab ${q.bab} · ${BAB_TITLES[q.bab]}</span></div>
-        <textarea placeholder="Tulis jawabanmu dalam bahasa Mandarin di sini…" data-tidx="${i}">${escapeHtml(userTypingAnswers[i] || "")}</textarea>
+        <div class="qtext">Terjemahkan ke Mandarin: <b>"${escapeHtml(q.prompt)}"</b></div>
+        <textarea placeholder="Tulis Hanzi di sini…" data-qid="${q.id}">${escapeHtml(userTypingAnswers[q.id] || "")}</textarea>
       `;
       mount.appendChild(card);
       card.querySelector("textarea").addEventListener("input", (e) => {
-        userTypingAnswers[i] = e.target.value;
+        userTypingAnswers[q.id] = e.target.value;
         updateProgress();
         saveActiveSession();
       });
-    }else{
+    } else {
+      if(!hanziHeaderAdded){
+        const h = document.createElement('h2');
+        h.style = "margin: 30px 0 15px 5px; color:var(--red-dark); font-size:18px;";
+        h.textContent = "Bagian II: Menyusun Kalimat (15 Soal)";
+        mount.appendChild(h);
+        hanziHeaderAdded = true;
+      }
       card.innerHTML = `
         <div class="qhead">
           <div class="qnum">${no}.</div>
           <span class="type-badge hz">✂ Susun Hanzi</span>
         </div>
-        <div class="qtext">Susun jadi kalimat: <b>"${escapeHtml(q.meaning)}"</b><span class="hint">Bab ${q.bab} · ${BAB_TITLES[q.bab]}</span></div>
-        <div class="assembled-row" id="assembled-${i}"></div>
-        <div class="pool-row" id="pool-${i}"></div>
-        <div class="hanzi-tools"><button type="button" data-reset="${i}">↺ Reset</button></div>
+        <div class="qtext">Susun kata kunci: <i style="font-size:13px; color:#7a6a58;">${escapeHtml(q.meaning)}</i></div>
+        <div class="assembled-row" id="assembled-${q.id}"></div>
+        <div class="pool-row" id="pool-${q.id}"></div>
+        <div class="hanzi-tools"><button type="button" data-reset="${q.id}">↺ Reset</button></div>
       `;
       mount.appendChild(card);
-      renderHanziQuestion(i);
-      card.querySelector(`[data-reset="${i}"]`).addEventListener("click", () => {
-        hanziState[i].assembled = [];
-        renderHanziQuestion(i);
+      renderHanziQuestion(q.id);
+      card.querySelector(`[data-reset="${q.id}"]`).addEventListener("click", () => {
+        hanziState[q.id].assembled = [];
+        renderHanziQuestion(q.id);
         updateProgress();
         saveActiveSession();
       });
@@ -487,14 +506,15 @@ function renderExamDOM(){
   updateProgress();
 }
 
-function renderHanziQuestion(i){
-  const state = hanziState[i];
-  const assembledMount = document.getElementById(`assembled-${i}`);
-  const poolMount = document.getElementById(`pool-${i}`);
+function renderHanziQuestion(qid){
+  const state = hanziState[qid];
+  const assembledMount = document.getElementById(`assembled-${qid}`);
+  const poolMount = document.getElementById(`pool-${qid}`);
+  if(!assembledMount || !poolMount) return;
 
   assembledMount.innerHTML = "";
   if(state.assembled.length === 0){
-    assembledMount.innerHTML = `<span class="placeholder">Klik kata di bawah untuk menyusun kalimat…</span>`;
+    assembledMount.innerHTML = `<span class="placeholder">Klik kata di bawah…</span>`;
   }else{
     state.assembled.forEach((word, pos) => {
       const chip = document.createElement("div");
@@ -502,7 +522,7 @@ function renderHanziQuestion(i){
       chip.textContent = word;
       chip.addEventListener("click", () => {
         state.assembled.splice(pos, 1);
-        renderHanziQuestion(i);
+        renderHanziQuestion(qid);
         updateProgress();
         saveActiveSession();
       });
@@ -511,18 +531,22 @@ function renderHanziQuestion(i){
   }
 
   poolMount.innerHTML = "";
+  // Hitung penggunaan kata (untuk menangani kata ganda dalam satu kalimat)
   const usedCounts = {};
   state.assembled.forEach(w => usedCounts[w] = (usedCounts[w]||0)+1);
-  const shownCounts = {};
+  
+  const currentShownCounts = {};
   state.tiles.forEach(word => {
-    shownCounts[word] = (shownCounts[word]||0)+1;
-    if(shownCounts[word] <= (usedCounts[word]||0)) return;
+    currentShownCounts[word] = (currentShownCounts[word]||0)+1;
+    // Jika kata ini sudah dipakai sebanyak jumlah di pool, jangan tampilkan lagi
+    if(currentShownCounts[word] <= (usedCounts[word]||0)) return;
+
     const chip = document.createElement("div");
     chip.className = "tile";
     chip.textContent = word;
     chip.addEventListener("click", () => {
       state.assembled.push(word);
-      renderHanziQuestion(i);
+      renderHanziQuestion(qid);
       updateProgress();
       saveActiveSession();
     });
@@ -531,150 +555,162 @@ function renderHanziQuestion(i){
 }
 
 function updateProgress(){
+  const total = examQuestions.length;
   let done = 0;
-  examQuestions.forEach((q, i) => {
+  examQuestions.forEach((q) => {
     if(q.type === "typing"){
-      if(userTypingAnswers[i] && userTypingAnswers[i].trim() !== "") done++;
+      if((userTypingAnswers[q.id] || "").trim() !== "") done++;
     }else{
-      const st = hanziState[i];
+      const st = hanziState[q.id];
       if(st && st.assembled.length === st.tiles.length && st.tiles.length > 0) done++;
     }
   });
-  document.getElementById("progress-text").textContent = `${done} dari ${TOTAL_SOAL} soal terjawab`;
-  document.getElementById("progress-fill").style.width = `${(done/TOTAL_SOAL)*100}%`;
+  document.getElementById("progress-text").textContent = `${done} dari ${total} soal terjawab`;
+  document.getElementById("progress-fill").style.width = `${(done/total)*100}%`;
 }
 
 /* ======================================================================
-   SUBMIT & PENILAIAN
+   SUBMIT & ASSESSMENT
    ====================================================================== */
 document.getElementById("btn-submit").addEventListener("click", async () => {
+  const totalSoal = examQuestions.length;
   let doneCount = 0;
-  examQuestions.forEach((q, i) => {
-    if(q.type === "typing"){ if(userTypingAnswers[i] && userTypingAnswers[i].trim() !== "") doneCount++; }
-    else{ const st = hanziState[i]; if(st && st.assembled.length === st.tiles.length && st.tiles.length>0) doneCount++; }
+  examQuestions.forEach((q) => {
+    if(q.type === "typing"){ if((userTypingAnswers[q.id]||"").trim() !== "") doneCount++; }
+    else{ const st = hanziState[q.id]; if(st && st.assembled.length === st.tiles.length) doneCount++; }
   });
-  if(doneCount < TOTAL_SOAL){
-    if(!confirm(`Baru ${doneCount} dari ${TOTAL_SOAL} soal yang dijawab. Tetap kumpulkan?`)) return;
+
+  if(doneCount < totalSoal){
+    if(!confirm(`Baru ${doneCount} dari ${totalSoal} soal dijawab. Tetap kumpulkan?`)) return;
   }
 
   let skorTyping = 0, skorHanzi = 0;
-  const perQuestionResult = []; // { no, type, correct(bool), ... }
-  const typingList = [];
-  const hanziList = [];
+  const perQuestionResult = [];
+  const typingList = []; // Untuk backend
+  const hanziList = [];  // Untuk backend
 
   examQuestions.forEach((q, i) => {
     const no = i + 1;
     if(q.type === "typing"){
-      const raw = userTypingAnswers[i] || "";
+      const raw = userTypingAnswers[q.id] || "";
       const norm = normalizeText(raw);
       const isCorrect = q.accepted.some(acc => normalizeText(acc) === norm) && norm !== "";
       if(isCorrect) skorTyping++;
       perQuestionResult.push({
-        no, type:"typing", correct:isCorrect,
-        prompt:q.prompt, chosen: raw || "(kosong)", correctExample: q.accepted[0]
+        no, type:"typing", correct:isCorrect, prompt:q.prompt, 
+        chosen: raw || "(kosong)", correctExample: q.accepted[0]
       });
-      typingList.push({ bab:q.bab, prompt:q.prompt, jawaban: raw });
-    }else{
-      const st = hanziState[i];
+      typingList.push({ prompt:q.prompt, jawaban: raw });
+    } else {
+      const st = hanziState[q.id];
       const assembled = st ? st.assembled : [];
-      const isCorrect = q.acceptedOrders.some(order =>
+      const isCorrect = q.acceptedOrders.some(order => 
         order.length === assembled.length && order.every((w,pos)=> w === assembled[pos])
       );
       if(isCorrect) skorHanzi++;
       const jawabanText = assembled.join("");
       perQuestionResult.push({
-        no, type:"hanzi", correct:isCorrect,
-        prompt:q.meaning, chosen: jawabanText || "(kosong)", correctExample: q.acceptedOrders[0].join("")
+        no, type:"hanzi", correct:isCorrect, prompt:q.meaning, 
+        chosen: jawabanText || "(kosong)", correctExample: q.acceptedOrders[0].join("")
       });
-      hanziList.push({ bab:q.bab, prompt:q.meaning, jawaban: jawabanText });
+      hanziList.push({ prompt:q.meaning, jawaban: jawabanText });
     }
   });
 
-  const totalGabungan = skorTyping + skorHanzi;
-
-  const result = {
-    nama: USER.nama, kelas: USER.kelas, waktu: new Date().toISOString(),
-    totalGabungan, totalSoal: TOTAL_SOAL,
-    typing: { benar: skorTyping, total: TOTAL_TYPING },
-    hanzi: { benar: skorHanzi, total: TOTAL_HANZI },
+  const totalCorrect = skorTyping + skorHanzi;
+  const resultData = {
+    nama: USER.nama, kelas: USER.kelas, waktu: new Date().toLocaleString('id-ID'),
+    totalCorrect, totalSoal,
+    typing: { benar: skorTyping, total: 10 },
+    hanzi: { benar: skorHanzi, total: 15 },
     perQuestionResult
   };
 
+  // Payload untuk Google Sheets
   const submission = {
     nama: USER.nama, kelas: USER.kelas,
-    skorTyping, totalTyping: TOTAL_TYPING,
-    skorHanzi, totalHanzi: TOTAL_HANZI,
-    totalGabungan, totalSoal: TOTAL_SOAL,
-    writing: typingList,   // -> kolom W1..W10 (ditampilkan di panel pengawas)
-    hanzi: hanziList,      // -> kolom H1..H15 (arsip, tidak ditampilkan di panel pengawas)
-    waktu: result.waktu
+    skorTyping, totalTyping: 10,
+    skorHanzi, totalHanzi: 15,
+    totalGabungan: totalCorrect, totalSoal,
+    typingAnswers: typingList, // Akan dipetakan ke kolom W1-W10
+    hanziAnswers: hanziList,   // Akan dipetakan ke kolom H1-H15
+    waktu: resultData.waktu
   };
 
   document.getElementById("btn-submit").disabled = true;
   document.getElementById("btn-submit").textContent = "Mengirim…";
 
   try{
-    if(!API_URL || API_URL.includes("PASTE_URL")){ throw new Error("API_URL belum diisi"); }
-    await fetch(API_URL, { method:"POST", body: JSON.stringify(submission) });
+    if(!API_URL || API_URL.includes("https://script.google.com/macros/s/AKfycbzE2lGgx4EnMk76w69oIJm98riqBgVowMOrJXw-F0R3QPxK6Roh3aq2fRF9xbDNWYshXQ/exec")) throw new Error("API URL kosong");
+    // Menggunakan mode no-cors jika Apps Script tidak diset untuk return JSON (paling aman agar tidak error CORS meskipun data tetap masuk)
+    await fetch(API_URL, { method:"POST", mode: 'no-cors', body: JSON.stringify(submission), headers:{'Content-Type':'application/json'} });
     toast("Jawaban berhasil dikumpulkan!");
   }catch(e){
-    console.error("Gagal mengirim ke backend:", e);
-    toast("Gagal mengirim ke server. Cek koneksi internet / konfigurasi API_URL.");
+    console.error(e);
+    alert("Gagal mengirim ke server. Pastikan API_URL benar. Namun hasil/koreksi tetap ditampilkan di layar ini.");
   }
 
-  fillResultScreen(result);
-  saveSubmittedSession(result);
+  fillResultScreen(resultData);
+  saveSubmittedSession(resultData);
   showScreen("screen-result");
 });
 
-function fillResultScreen(result){
-  document.getElementById("res-score").textContent = result.totalGabungan;
-  document.querySelector(".seal-big .of").textContent = `/ ${result.totalSoal} BENAR`;
-  document.getElementById("res-name").textContent = result.nama;
-  document.getElementById("rc-name").textContent = result.nama;
-  document.getElementById("rc-kelas").textContent = result.kelas;
-  document.getElementById("rc-typing").textContent = `${result.typing.benar} / ${result.typing.total}`;
-  document.getElementById("rc-hanzi").textContent = `${result.hanzi.benar} / ${result.hanzi.total}`;
-  document.getElementById("rc-total").textContent = `${result.totalGabungan} / ${result.totalSoal}`;
-  document.getElementById("rc-time").textContent = new Date(result.waktu).toLocaleString("id-ID");
+function fillResultScreen(res){
+  document.getElementById("res-score").textContent = res.totalCorrect;
+  document.querySelector(".seal-big .of").textContent = `/ ${res.totalSoal} BENAR`;
+  document.getElementById("res-name").textContent = res.nama;
+  document.getElementById("rc-name").textContent = res.nama;
+  document.getElementById("rc-kelas").textContent = res.kelas;
+  document.getElementById("rc-typing").textContent = `${res.typing.benar} / ${res.typing.total}`;
+  document.getElementById("rc-hanzi").textContent = `${res.hanzi.benar} / ${res.hanzi.total}`;
+  document.getElementById("rc-total").textContent = `${res.totalCorrect} / ${res.totalSoal}`;
+  document.getElementById("rc-time").textContent = res.waktu;
 
-  const ovMount = document.getElementById("overview-grid");
-  ovMount.innerHTML = "";
-  result.perQuestionResult.forEach(r => {
+  // Grid ringkasan
+  const grid = document.getElementById("overview-grid");
+  grid.innerHTML = "";
+  const wrongWrap = document.getElementById("wrong-wrap");
+  wrongWrap.innerHTML = "";
+  let hasWrong = false;
+
+  res.perQuestionResult.forEach(q => {
     const badge = document.createElement("div");
-    badge.className = "ov-badge " + (r.correct ? "correct" : "wrong");
-    badge.textContent = r.no;
-    badge.title = r.correct ? "Benar" : "Salah — klik untuk detail";
-    if(!r.correct){
-      badge.addEventListener("click", () => {
-        const target = document.getElementById(`wrong-detail-${r.no}`);
-        if(target){ target.scrollIntoView({behavior:"smooth", block:"center"}); target.style.borderColor = "var(--red)"; }
+    badge.className = `ov-badge ${q.correct?'correct':'wrong'}`;
+    badge.textContent = q.no;
+    if(!q.correct){
+      hasWrong = true;
+      const wrongId = `wrong-det-${q.no}`;
+      badge.addEventListener("click", ()=>{
+        document.getElementById(wrongId).scrollIntoView({behavior:'smooth', block:'center'});
+        document.getElementById(wrongId).style.background = "#fff0f0";
+        setTimeout(()=> document.getElementById(wrongId).style.background = "var(--paper)", 1000);
       });
+
+      // Detail kesalahan
+      const det = document.createElement("div");
+      det.className = "wrong-item";
+      det.id = wrongId;
+      det.innerHTML = `
+        <div class="row-main"><span class="no">${q.no}.</span> <span class="q">${escapeHtml(q.prompt)}</span></div>
+        <div class="compare">Jawabanmu: <b>${escapeHtml(q.chosen)}</b></div>
+        <div class="compare">Contoh Benar: <span class="ok">${escapeHtml(q.correctExample)}</span></div>
+      `;
+      wrongWrap.appendChild(det);
     }
-    ovMount.appendChild(badge);
+    grid.appendChild(badge);
   });
 
-  const wrapEl = document.getElementById("wrong-wrap");
-  const wrongOnes = result.perQuestionResult.filter(r => !r.correct);
-  if(wrongOnes.length === 0){
-    wrapEl.innerHTML = `<div class="all-correct-note">🎉 Semua jawaban benar! Kerja bagus.</div>`;
-  }else{
-    let html = `<h3>Detail Soal yang Salah (${wrongOnes.length} dari ${result.totalSoal})</h3>`;
-    wrongOnes.forEach(r => {
-      const label = r.type === "typing" ? "打字 · Translate" : "✂ Susun Hanzi";
-      html += `<div class="wrong-item" id="wrong-detail-${r.no}">
-        <span class="no">No. ${r.no}</span><span class="q">[${label}] ${escapeHtml(r.prompt)}</span>
-        <div class="compare">Jawabanmu: <b>${escapeHtml(r.chosen)}</b><br>Salah satu contoh benar: <span class="ok">${escapeHtml(r.correctExample)}</span></div>
-      </div>`;
-    });
-    wrapEl.innerHTML = html;
+  if(!hasWrong){
+    wrongWrap.innerHTML = `<div class="all-correct-note">🎉 Luar biasa! Kamu menjawab semua dengan benar.</div>`;
+  } else {
+    const h3 = document.createElement('h3'); h3.textContent = "Detail Jawaban Salah";
+    wrongWrap.prepend(h3);
   }
 }
 
-/* ======================================================================
-   INIT
-   ====================================================================== */
+// Jalankan saat load
 tryRestoreSession();
+
 </script>
 </body>
 </html>
