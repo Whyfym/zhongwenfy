@@ -35,7 +35,6 @@
   .logo .word{ font-size:20px; font-weight:700; }
   .pill{ font-size:12px; padding:6px 12px; border-radius:999px; background:var(--blush); color:var(--red-dark); font-weight:600; }
 
-  /* ---------- gate screen ---------- */
   .gate-wrap{ max-width:420px; margin:90px auto; background:var(--paper); border:1px solid var(--line);
     border-radius:20px; padding:38px 34px; box-shadow:0 20px 50px -25px rgba(43,35,32,0.35); text-align:center; }
   .gate-wrap .icon{
@@ -57,12 +56,12 @@
   .btn-ghost:hover{ border-color:var(--red); }
   .gate-err{ color:var(--red-dark); font-size:12.5px; margin:-4px 0 12px; display:none; }
 
-  /* ---------- dashboard ---------- */
-  .wrap{ max-width:1200px; margin:0 auto; padding:30px 20px 80px; }
-  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px; }
-  @media (max-width:800px){ .stats{ grid-template-columns:1fr 1fr; } }
+  .wrap{ max-width:1300px; margin:0 auto; padding:30px 20px 80px; }
+  .stats{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px; }
+  @media (max-width:900px){ .stats{ grid-template-columns:1fr 1fr 1fr; } }
+  @media (max-width:600px){ .stats{ grid-template-columns:1fr 1fr; } }
   .stat-card{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
-  .stat-card .num{ font-family:'Noto Serif SC'; font-weight:900; font-size:28px; color:var(--red); }
+  .stat-card .num{ font-family:'Noto Serif SC'; font-weight:900; font-size:26px; color:var(--red); }
   .stat-card .label{ font-size:12px; color:#8a7b6a; margin-top:4px; }
 
   .top-actions{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px; }
@@ -70,9 +69,7 @@
   .top-actions .sub{ font-size:12.5px; color:#8a7b6a; margin-top:4px; }
   .actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
-  .search-box{
-    margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-  }
+  .search-box{ margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   .search-box input{
     flex:1; min-width:220px; padding:11px 14px; border-radius:12px; border:1.5px solid var(--line);
     font-family:'Poppins'; font-size:14px; outline:none;
@@ -88,6 +85,7 @@
   table.sheet th.sortable{ cursor:pointer; user-select:none; }
   table.sheet th.sortable:hover{ background:var(--red-dark); }
   .score-cell{ font-weight:700; color:var(--red-dark); white-space:nowrap; }
+  .score-cell.total{ color:var(--ok); }
 
   .table-scroll{ overflow:auto; max-height:70vh; border-radius:14px; }
   .empty-note{ text-align:center; color:#9a897a; font-size:14px; padding:60px 20px; background:var(--paper);
@@ -131,15 +129,16 @@
   <div class="wrap">
     <div class="stats">
       <div class="stat-card"><div class="num" id="st-total">0</div><div class="label">Peserta mengumpulkan</div></div>
-      <div class="stat-card"><div class="num" id="st-avg">0</div><div class="label">Rata-rata skor reading (dari 50)</div></div>
-      <div class="stat-card"><div class="num" id="st-max">0</div><div class="label">Skor tertinggi</div></div>
-      <div class="stat-card"><div class="num" id="st-min">0</div><div class="label">Skor terendah</div></div>
+      <div class="stat-card"><div class="num" id="st-avg-typing">0</div><div class="label">Rata-rata Translate (dari 10)</div></div>
+      <div class="stat-card"><div class="num" id="st-avg-hanzi">0</div><div class="label">Rata-rata Susun Hanzi (dari 15)</div></div>
+      <div class="stat-card"><div class="num" id="st-avg-total">0</div><div class="label">Rata-rata Total Gabungan (dari 25)</div></div>
+      <div class="stat-card"><div class="num" id="st-max-total">0</div><div class="label">Total Gabungan tertinggi</div></div>
     </div>
 
     <div class="top-actions">
       <div>
-        <h2>Rekap Semua Peserta</h2>
-        <div class="sub">Jumlah jawaban benar reading per peserta, plus jawaban writing (tanpa koreksi otomatis).</div>
+        <h2>Rekap Semua Peserta — Ujian Midterm</h2>
+        <div class="sub">Kolom W1–W10 = jawaban Translate/mengetik (untuk ditinjau manual). Susun Hanzi sudah dikoreksi otomatis, jadi hanya ditampilkan sebagai skor.</div>
       </div>
       <div class="actions">
         <button class="btn btn-ghost" id="btn-refresh">↻ Refresh</button>
@@ -153,7 +152,7 @@
     </div>
 
     <div id="table-mount"><div class="empty-note">Memuat data…</div></div>
-    <div class="footer-note">Mandarinfy — Panel Pengawas. Data direkap otomatis dari setiap pengumpulan ujian.</div>
+    <div class="footer-note">Mandarinfy — Panel Pengawas. Data direkap otomatis dari setiap pengumpulan ujian midterm.</div>
   </div>
 </div>
 
@@ -162,10 +161,10 @@
 const ACCESS_CODE = "MANDARINFY2026";
 
 /* Tempel URL Web App Google Apps Script yang sama seperti di mandarinfy.html */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4jOA-D0n2auj42W6yhfcF6glIMDzxoZ3-31it6u5uoRzsxfMzsHiKNhsSJtNptCqs/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzE2lGgx4EnMk76w69oIJm98riqBgVowMOrJXw-F0R3QPxK6Roh3aq2fRF9xbDNWYshXQ/exec";
 
 let sortKey = "waktu";
-let sortDir = -1; // -1 = terbaru dulu / desc
+let sortDir = -1;
 let allRows = [];
 
 function toast(msg){
@@ -183,10 +182,7 @@ document.getElementById("in-code").addEventListener("keydown", e => { if(e.key==
 function tryUnlock(){
   const val = document.getElementById("in-code").value.trim();
   const err = document.getElementById("gate-err");
-  if(val !== ACCESS_CODE){
-    err.style.display = "block";
-    return;
-  }
+  if(val !== ACCESS_CODE){ err.style.display = "block"; return; }
   err.style.display = "none";
   document.getElementById("screen-gate").classList.add("hidden");
   document.getElementById("screen-dash").classList.remove("hidden");
@@ -204,14 +200,14 @@ async function loadData(){
   const mount = document.getElementById("table-mount");
   mount.innerHTML = `<div class="empty-note">Memuat data…</div>`;
   try{
-    if(!API_URL || API_URL.includes("PASTE_URL")){
+    if(!API_URL || API_URL.includes("https://script.google.com/macros/s/AKfycbzE2lGgx4EnMk76w69oIJm98riqBgVowMOrJXw-F0R3QPxK6Roh3aq2fRF9xbDNWYshXQ/exec")){
       mount.innerHTML = `<div class="empty-note">API_URL belum diisi. Tempel URL Google Apps Script kamu di bagian atas &lt;script&gt; pada file ini.</div>`;
       return;
     }
     const res = await fetch(API_URL, { method: "GET" });
     const raw = await res.json();
-    // ubah dari format kolom sheet (Waktu, Nama, Kelas, SkorBenar, TotalSoal, W1..Wn)
-    // ke bentuk internal {waktu, nama, kelas, skorReading, totalReading, writing:[{jawaban}]}
+    // Kolom sheet: Waktu, Nama, Kelas, SkorTyping, TotalTyping, SkorHanzi, TotalHanzi,
+    // TotalGabungan, TotalSoal, W1..W10 (jawaban mengetik), H1..H15 (susun hanzi, tidak ditampilkan)
     const rows = raw.map(r => {
       const writing = Object.keys(r)
         .filter(k => /^W\d+$/.test(k))
@@ -221,8 +217,12 @@ async function loadData(){
         waktu: r.Waktu,
         nama: r.Nama,
         kelas: r.Kelas,
-        skorReading: Number(r.SkorBenar),
-        totalReading: Number(r.TotalSoal),
+        skorTyping: r.SkorTyping !== undefined && r.SkorTyping !== "" ? Number(r.SkorTyping) : null,
+        totalTyping: r.TotalTyping !== undefined && r.TotalTyping !== "" ? Number(r.TotalTyping) : null,
+        skorHanzi: r.SkorHanzi !== undefined && r.SkorHanzi !== "" ? Number(r.SkorHanzi) : null,
+        totalHanzi: r.TotalHanzi !== undefined && r.TotalHanzi !== "" ? Number(r.TotalHanzi) : null,
+        totalGabungan: r.TotalGabungan !== undefined && r.TotalGabungan !== "" ? Number(r.TotalGabungan) : null,
+        totalSoal: r.TotalSoal !== undefined && r.TotalSoal !== "" ? Number(r.TotalSoal) : null,
         writing
       };
     });
@@ -238,29 +238,35 @@ async function loadData(){
 function renderStats(rows){
   document.getElementById("st-total").textContent = rows.length;
   if(rows.length === 0){
-    document.getElementById("st-avg").textContent = "0";
-    document.getElementById("st-max").textContent = "0";
-    document.getElementById("st-min").textContent = "0";
+    document.getElementById("st-avg-typing").textContent = "0";
+    document.getElementById("st-avg-hanzi").textContent = "0";
+    document.getElementById("st-avg-total").textContent = "0";
+    document.getElementById("st-max-total").textContent = "0";
     return;
   }
-  const scores = rows.map(r => r.skorReading);
-  const avg = (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1);
-  document.getElementById("st-avg").textContent = avg;
-  document.getElementById("st-max").textContent = Math.max(...scores);
-  document.getElementById("st-min").textContent = Math.min(...scores);
+  const typingScores = rows.map(r => r.skorTyping).filter(v => v !== null && !isNaN(v));
+  const hanziScores = rows.map(r => r.skorHanzi).filter(v => v !== null && !isNaN(v));
+  const totalScores = rows.map(r => r.totalGabungan).filter(v => v !== null && !isNaN(v));
+
+  document.getElementById("st-avg-typing").textContent = typingScores.length
+    ? (typingScores.reduce((a,b)=>a+b,0)/typingScores.length).toFixed(1) : "-";
+  document.getElementById("st-avg-hanzi").textContent = hanziScores.length
+    ? (hanziScores.reduce((a,b)=>a+b,0)/hanziScores.length).toFixed(1) : "-";
+  document.getElementById("st-avg-total").textContent = totalScores.length
+    ? (totalScores.reduce((a,b)=>a+b,0)/totalScores.length).toFixed(1) : "-";
+  document.getElementById("st-max-total").textContent = totalScores.length ? Math.max(...totalScores) : "-";
 }
 
 function sortRows(rows){
-  const sorted = rows.slice().sort((a,b) => {
+  return rows.slice().sort((a,b) => {
     let av, bv;
     if(sortKey === "waktu"){ av = new Date(a.waktu).getTime(); bv = new Date(b.waktu).getTime(); }
-    else if(sortKey === "skorReading"){ av = a.skorReading; bv = b.skorReading; }
+    else if(["skorTyping","skorHanzi","totalGabungan"].includes(sortKey)){ av = a[sortKey] || 0; bv = b[sortKey] || 0; }
     else { av = (a[sortKey]||"").toString().toLowerCase(); bv = (b[sortKey]||"").toString().toLowerCase(); }
     if(av < bv) return -1*sortDir;
     if(av > bv) return 1*sortDir;
     return 0;
   });
-  return sorted;
 }
 
 function renderTable(rows){
@@ -276,7 +282,9 @@ function renderTable(rows){
     <th class="sortable" data-key="waktu">Waktu ⇅</th>
     <th class="sortable" data-key="nama">Nama ⇅</th>
     <th class="sortable" data-key="kelas">Kelas ⇅</th>
-    <th class="sortable" data-key="skorReading">Skor Benar ⇅</th>
+    <th class="sortable" data-key="skorTyping">Skor Translate ⇅</th>
+    <th class="sortable" data-key="skorHanzi">Skor Susun Hanzi ⇅</th>
+    <th class="sortable" data-key="totalGabungan">Total Gabungan ⇅</th>
     ${writingCols.map(c=>`<th>${c}</th>`).join("")}
     </tr></thead><tbody>`;
   rows.forEach(r => {
@@ -284,7 +292,9 @@ function renderTable(rows){
       <td>${new Date(r.waktu).toLocaleString("id-ID")}</td>
       <td>${escapeHtml(r.nama||"")}</td>
       <td>${escapeHtml(r.kelas||"")}</td>
-      <td class="score-cell">${r.skorReading} / ${r.totalReading}</td>
+      <td class="score-cell">${r.skorTyping !== null ? r.skorTyping + " / " + r.totalTyping : "—"}</td>
+      <td class="score-cell">${r.skorHanzi !== null ? r.skorHanzi + " / " + r.totalHanzi : "—"}</td>
+      <td class="score-cell total">${r.totalGabungan !== null ? r.totalGabungan + " / " + r.totalSoal : "—"}</td>
       ${(r.writing||[]).map(w => `<td class="writing-cell">${escapeHtml(w.jawaban||"—")}</td>`).join("")}
     </tr>`;
   });
@@ -318,21 +328,24 @@ document.getElementById("btn-export-csv").addEventListener("click", () => {
   if(rows.length === 0){ toast("Belum ada data untuk diekspor."); return; }
   const writingCount = (rows[0].writing || []).length;
   const writingCols = Array.from({length: writingCount}, (_,i)=>`W${i+1}`);
-  const header = ["Waktu","Nama","Kelas","Skor Benar","Total Soal", ...writingCols];
+  const header = ["Waktu","Nama","Kelas","Skor Translate","Total Translate","Skor Susun Hanzi","Total Susun Hanzi","Total Gabungan","Total Soal", ...writingCols];
   const csvRows = [header.join(",")];
   rows.forEach(r => {
     const line = [
       new Date(r.waktu).toLocaleString("id-ID"),
-      r.nama, r.kelas, r.skorReading, r.totalReading,
+      r.nama, r.kelas,
+      r.skorTyping, r.totalTyping,
+      r.skorHanzi, r.totalHanzi,
+      r.totalGabungan, r.totalSoal,
       ...(r.writing||[]).map(w => (w.jawaban||"").replace(/\n/g," "))
-    ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+    ].map(v => `"${String(v==null?"":v).replace(/"/g,'""')}"`);
     csvRows.push(line.join(","));
   });
   const blob = new Blob([csvRows.join("\n")], {type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `mandarinfy-rekap-pengawas-${Date.now()}.csv`;
+  a.download = `mandarinfy-midterm-rekap-${Date.now()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   toast("CSV berhasil diunduh — bisa langsung diimpor ke Google Sheets.");
