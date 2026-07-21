@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="id" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandarinfy — Ujian Midterm HSK 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Poppins:wght@400;500;600;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6; --paper:#FFFDF9; --ink:#2B2320;
+    --red:#B3272D; --red-dark:#8C1F24; --blush:#FBE1E1;
+    --gold:#C9982E; --line:#E7D9C4; --ok:#3E7D4C; --bad:#B3272D;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream);
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(179,39,45,0.06), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(201,152,46,0.08), transparent 40%);
+    font-family:'Poppins', sans-serif; color:var(--ink); min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Noto Serif SC', serif; margin:0; }
+  ::selection{ background:var(--blush); }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:18px 28px; background:var(--paper); border-bottom:3px solid var(--red); }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo .seal{ width:36px; height:36px; border-radius:10px; background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Noto Serif SC'; font-weight:900; font-size:18px; box-shadow:0 3px 0 var(--red-dark); }
+  .logo .word{ font-size:20px; font-weight:700; letter-spacing:.2px; }
+  .logo .word .cn{ font-size:13px; color:var(--red); margin-left:6px; font-weight:500;}
+  .userinfo{ font-size:13px; color:#5a4c3d; text-align:right; }
+  .userinfo b{ color:var(--ink); }
+
+  .wrap{ max-width:880px; margin:0 auto; padding:32px 20px 80px; }
+
+  .login-hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:0; max-width:920px; margin:48px auto; background:var(--paper); border-radius:22px; overflow:hidden; box-shadow:0 20px 50px -25px rgba(43,35,32,0.35); border:1px solid var(--line); }
+  .login-left{ background:linear-gradient(180deg, rgba(179,39,45,0.94), rgba(140,31,36,0.96)), repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 22px); color:#fff; padding:44px 36px; display:flex; flex-direction:column; justify-content:space-between; }
+  .login-left h1{ font-size:34px; line-height:1.1; color:#fff; }
+  .login-left .cn-big{ font-family:'Zhi Mang Xing', cursive; font-size:52px; display:block; opacity:.92; }
+  .login-left p{ opacity:.85; font-size:14px; line-height:1.6; margin-top:14px; }
+  .stamp-ring{ align-self:flex-start; margin-top:26px; width:96px; height:96px; border-radius:50%; border:2.5px solid rgba(255,255,255,0.75); display:flex; align-items:center; justify-content:center; font-family:'Noto Serif SC'; font-weight:900; font-size:13px; text-align:center; line-height:1.3; transform:rotate(-8deg); color:#fff; }
+  .login-right{ padding:40px 36px; }
+  .login-right h2{ font-size:22px; margin-bottom:4px; }
+  .login-right .sub{ font-size:13px; color:#7a6a58; margin-bottom:24px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#544639; }
+  .field input{ width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line); font-family:'Poppins'; font-size:15px; background:#fffefb; outline:none; transition:.15s; }
+  .field input:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+  .btn{ appearance:none; border:none; cursor:pointer; font-family:'Poppins'; font-weight:600; padding:14px 22px; border-radius:12px; font-size:15px; transition:.15s; }
+  .btn-primary{ background:var(--red); color:#fff; box-shadow:0 4px 0 var(--red-dark); width:100%; }
+  .btn-primary:hover{ transform:translateY(1px); box-shadow:0 3px 0 var(--red-dark); }
+  .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-ghost{ background:transparent; color:var(--red-dark); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--red); }
+  .login-foot{ text-align:center; margin-top:16px; font-size:12px; color:#9a897a; }
+  .err{ color:var(--bad); font-size:12.5px; margin-top:-8px; margin-bottom:14px; display:none; }
+
+  .exam-head{ margin-bottom:26px; }
+  .exam-head h1{ font-size:26px; }
+  .exam-head .meta{ font-size:13px; color:#7a6a58; margin-top:6px; }
+  .progressbar{ height:8px; background:var(--blush); border-radius:99px; margin-top:16px; overflow:hidden; }
+  .progressbar > div{ height:100%; background:var(--red); width:0%; transition:width .2s; }
+
+  .type-badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; }
+  .type-badge.tp{ background:#E9F3EA; color:var(--ok); }
+  .type-badge.hz{ background:var(--blush); color:var(--red-dark); }
+
+  .qcard{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin-bottom:14px; box-shadow:0 6px 18px -14px rgba(43,35,32,0.5); }
+  .qcard .qhead{ display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  .qcard .qnum{ color:var(--red); font-weight:700; font-size:14px; flex:none; }
+  .qcard .qtext{ font-size:16px; font-weight:500; line-height:1.5; flex:1; }
+  .qcard .hint{ display:block; font-size:12.5px; color:#8a7b6a; font-weight:400; margin-top:3px; }
+
+  .writing-card textarea{ width:100%; margin-top:12px; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; font-family:'Poppins'; font-size:15px; resize:vertical; min-height:64px; outline:none; }
+  .writing-card textarea:focus{ border-color:var(--red); box-shadow:0 0 0 4px rgba(179,39,45,0.09); }
+
+  .assembled-row{ display:flex; flex-wrap:wrap; gap:8px; min-height:52px; padding:10px; background:#fbf6ec; border:1.5px dashed var(--line); border-radius:12px; margin-top:12px; }
+  .assembled-row .placeholder{ font-size:13px; color:#b0a08e; align-self:center; }
+  .pool-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .tile{ font-family:'Noto Serif SC'; font-weight:700; font-size:16px; padding:9px 14px; border-radius:10px; border:1.5px solid var(--line); background:#fff; cursor:pointer; transition:.12s; user-select:none; }
+  .tile:hover{ border-color:var(--red); }
+  .tile.in-answer{ background:var(--red); color:#fff; border-color:var(--red-dark); }
+  .hanzi-tools{ display:flex; justify-content:flex-end; margin-top:8px; }
+  .hanzi-tools button{ font-size:12px; background:none; border:none; color:var(--red-dark); font-weight:600; cursor:pointer; text-decoration:underline; font-family:'Poppins'; }
+
+  .submit-zone{ margin-top:34px; background:var(--paper); border:1px dashed var(--line); border-radius:16px; padding:22px; text-align:center; }
+  .submit-zone p{ font-size:13px; color:#8a7b6a; margin:8px 0 16px; }
+  .submit-zone .btn-primary{ width:auto; padding:14px 40px; }
+
+  .result-wrap{ max-width:700px; margin:60px auto 100px; text-align:center; }
+  .seal-big{ width:150px; height:150px; margin:0 auto 22px; border-radius:50%; border:4px solid var(--red); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--red); transform:rotate(-6deg); font-family:'Noto Serif SC'; box-shadow:0 0 0 6px rgba(179,39,45,0.08); }
+  .seal-big .score{ font-size:38px; font-weight:900; line-height:1; }
+  .seal-big .of{ font-size:11px; font-weight:600; margin-top:2px; }
+  .result-wrap h2{ font-size:26px; margin-bottom:8px; }
+  .result-wrap p{ color:#7a6a58; font-size:14px; line-height:1.6; }
+  .result-card{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:22px; margin-top:26px; text-align:left; font-size:14px; }
+  .result-card .row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); }
+  .result-card .row:last-child{ border-bottom:none; }
+  .result-card .row b{ color:var(--red-dark); }
+
+  .overview-wrap{ text-align:left; margin-top:28px; }
+  .overview-wrap h3{ font-size:16px; margin-bottom:10px; }
+  .overview-grid{ display:flex; flex-wrap:wrap; gap:7px; }
+  .ov-badge{ width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Noto Serif SC'; }
+  .ov-badge.correct{ background:#E9F3EA; color:var(--ok); border:1.5px solid #bfe0c6; }
+  .ov-badge.wrong{ background:var(--blush); color:var(--red-dark); border:1.5px solid #f0bcbe; cursor:pointer; }
+
+  .wrong-wrap{ text-align:left; margin-top:24px; }
+  .wrong-wrap h3{ font-size:16px; margin-bottom:10px; }
+  .wrong-item{ background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:13px; }
+  .wrong-item .no{ color:var(--red); font-weight:700; margin-right:6px; }
+  .wrong-item .q{ font-weight:500; }
+  .wrong-item .compare{ margin-top:6px; font-size:12.5px; color:#7a6a58; }
+  .wrong-item .compare b{ color:var(--bad); }
+  .wrong-item .compare .ok{ color:var(--ok); font-weight:700; }
+  .all-correct-note{ text-align:center; background:var(--paper); border:1px dashed var(--line); border-radius:14px; padding:20px; color:var(--ok); font-weight:600; margin-top:20px; }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; box-shadow:0 10px 30px -10px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:.25s; z-index:99; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; font-size:11.5px; color:#a99a89; margin-top:40px; }
+  .no-select { user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+  .no-select textarea { user-select: text; -webkit-user-select: text; }
+</style>
+</head>
+<body class="notranslate">
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login">
+  <div class="login-hero">
+    <div class="login-left">
+      <div>
+        <span class="cn-big">期中考试</span>
+        <h1>Mandarinfy</h1>
+        <p>Ujian Midterm HSK 2. 25 soal: 10 soal Translate (打字) dan 15 soal Susun Hanzi. Urutan soal diacak untuk setiap peserta.</p>
+      </div>
+      <div class="stamp-ring">MANDARINFY<br>MIDTERM</div>
+    </div>
+    <div class="login-right">
+      <h2>Mulai Ujian</h2>
+      <div class="sub">Isi data dirimu untuk memulai. Hasil akan otomatis tercatat.</div>
+      <div class="field">
+        <label for="in-nama">Nama Lengkap</label>
+        <input type="text" id="in-nama" placeholder="cth. Siti Aminah">
+      </div>
+      <div class="field">
+        <label for="in-kelas">Kelas</label>
+        <input type="text" id="in-kelas" placeholder="cth. HSK2-A">
+      </div>
+      <div class="err" id="login-err">Nama dan kelas wajib diisi ya.</div>
+      <button class="btn btn-primary" id="btn-start">Mulai Ujian →</button>
+      <div class="login-foot">10 soal translate (打字) · 15 soal susun hanzi</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EXAM SCREEN ============ -->
+<div id="screen-exam" class="hidden">
+  <div class="topbar">
+    <div class="logo"><div class="seal">中</div><div class="word">Mandarinfy <span class="cn">学中文</span></div></div>
+    <div class="userinfo" id="exam-userinfo"></div>
+  </div>
+  <div class="wrap">
+    <div class="exam-head">
+      <h1>Ujian Midterm HSK 2</h1>
+      <div class="meta" id="progress-text">0 dari 25 soal terjawab</div>
+      <div class="progressbar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="quiz-mount" class="no-select"></div>
+
+    <div class="submit-zone">
+      <h3>Sudah yakin dengan semua jawaban?</h3>
+      <p>Setelah dikumpulkan, jawaban tidak bisa diubah lagi.</p>
+      <button class="btn btn-primary" id="btn-submit">Kumpulkan Ujian</button>
+    </div>
+    <div class="footer-note">Mandarinfy — Ujian Midterm HSK 2, Bab 1–8.</div>
+  </div>
+</div>
+
+<!-- ============ RESULT SCREEN ============ -->
+<div id="screen-result" class="hidden">
+  <div class="topbar">
+    <div class="logo"><div class="seal">中</div><div class="word">Mandarinfy <span class="cn">学中文</span></div></div>
+  </div>
+  <div class="result-wrap">
+    <div class="seal-big">
+      <div class="score" id="res-score">0</div>
+      <div class="of">/ 25 BENAR</div>
+    </div>
+    <h2>Ujian selesai, <span id="res-name">-</span>!</h2>
+    <p>Berikut rincian hasil ujianmu. Lihat urutan soal yang salah di bawah supaya bisa belajar lagi.</p>
+    <div class="result-card">
+      <div class="row"><span>Nama</span><b id="rc-name">-</b></div>
+      <div class="row"><span>Kelas</span><b id="rc-kelas">-</b></div>
+      <div class="row"><span>Skor Translate (打字)</span><b id="rc-typing">-</b></div>
+      <div class="row"><span>Skor Susun Hanzi</span><b id="rc-hanzi">-</b></div>
+      <div class="row"><span>Total Gabungan</span><b id="rc-total">-</b></div>
+      <div class="row"><span>Waktu Submit</span><b id="rc-time">-</b></div>
+    </div>
+
+    <div class="overview-wrap">
+      <h3>Ringkasan Urutan Soal (klik nomor yang salah untuk lihat detail)</h3>
+      <div class="overview-grid" id="overview-grid"></div>
+    </div>
+
+    <div class="wrong-wrap" id="wrong-wrap"></div>
+
+    <button class="btn btn-ghost" id="btn-back-login" style="margin-top:24px;">Kembali ke Halaman Login</button>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   UTIL: normalisasi teks untuk koreksi otomatis (abaikan spasi & tanda baca)
+   ====================================================================== */
+function normalizeText(s){
+  return String(s || "")
+    .replace(/[\s，,。.！!？?、；;：:""'']/g, "")
+    .trim();
+}
+
+/* ======================================================================
+   DATA: 10 soal Translate / Mengetik (打字) — Bab 1-8
+   accepted: daftar kemungkinan jawaban benar (variasi grammar berbeda,
+   makna & konteks tetap sama)
+   ====================================================================== */
+const TYPING = [
+  { bab:1, prompt:"Terjemahkan: \"Sebaiknya kamu ikut acara pernikahan kerabatmu.\"",
+    accepted:["你还是参加你亲戚的婚礼吧","你还是去参加你亲戚的婚礼吧","你还是去你亲戚的婚礼吧","你还是参加你的亲戚的婚礼吧"] },
+  { bab:1, prompt:"Terjemahkan: \"Kamu bisa menjual baju, juga bisa menjual sepatu.\"",
+    accepted:["你可以卖衣服，也可以卖鞋子","你可以卖衣服也可以卖鞋子","你可以卖衣服，也可以卖鞋","你可以卖衣服，也可以卖鞋子。"] },
+  { bab:2, prompt:"Terjemahkan: \"Saya sudah menunggu 1 jam, tapi dia baru datang.\"",
+    accepted:["我等了一个小时，他才来","我已经等了一个小时，他才来","我等了一个小时,他才来","我等了一个小时他才来"] },
+  { bab:4, prompt:"Terjemahkan: \"Sepatu ini terlalu kecil, aku terpaksa harus menukarnya.\"",
+    accepted:["这双鞋太小了，我只好换","这双鞋太小了，我只好去换","这双鞋子太小了，我只好换","这双鞋太小了我只好换"] },
+  { bab:5, prompt:"Terjemahkan: \"Program ini bagus, juga sangat menarik.\"",
+    accepted:["这个节目又好又有意思","这个节目又好看又有意思","这个节目又好又有趣","这个节目又好又有意思。"] },
+  { bab:5, prompt:"Terjemahkan: \"Toko roti ini membutuhkan sekitar 4 sampai 5 karyawan.\"",
+    accepted:["这个面包店需要四五个员工","这家面包店需要四五个员工","这个面包店需要四五个工作人员","这个面包店大概需要四五个员工"] },
+  { bab:6, prompt:"Terjemahkan: \"Metode belajar saya dan dia tidak sama.\"",
+    accepted:["我的学习方法跟他的不一样","我的学习方法和他的不一样","我跟他的学习方法不一样","我和他的学习方法不一样"] },
+  { bab:6, prompt:"Terjemahkan: \"Tolong kamu letakkan botol air minum di dalam tas sekolah.\"",
+    accepted:["请你把水瓶放在书包里","你把水瓶放在书包里","请把水瓶放进书包里","请你把水瓶放到书包里"] },
+  { bab:7, prompt:"Terjemahkan: \"Baju atasan itu longgar, jadi saya sedikit marah.\"",
+    accepted:["那件上衣有点儿宽松，所以我有点儿生气","那件上衣有点宽松，所以我有点儿生气","那件上衣有点儿肥，所以我有点儿生气","那件上衣有点儿宽松,所以我有点儿生气"] },
+  { bab:1, prompt:"Terjemahkan: \"Lusa aku ada ujian bahasa Inggris, jadi hari ini harus belajar bahasa Inggris.\"",
+    accepted:["后天我有英语考试，所以今天要学习英语","后天我有英语考试，所以今天得学英语","后天我有英语考试，今天要学习英语","后天我有英语考试所以今天要学习英语"] }
+];
+
+/* ======================================================================
+   DATA: 15 soal Susun Hanzi — Bab 1-8
+   acceptedOrders: array of array (bisa lebih dari satu urutan benar)
+   ====================================================================== */
+const HANZI = [
+  { bab:1, meaning:"Pak itu memberikan aku seikat bunga.", tiles:["先生","送给","我","一束","花"],
+    acceptedOrders:[["先生","送给","我","一束","花"]] },
+  { bab:1, meaning:"Pengucapanku selalu tidak bagus, sebaiknya bagaimana ya?", tiles:["我的","发音","总是","不好","应该","怎么办"],
+    acceptedOrders:[["我的","发音","总是","不好","应该","怎么办"]] },
+  { bab:2, meaning:"Menurutmu apakah bahasa Mandarin kita ada kemajuan?", tiles:["你","觉得","咱们","汉语","有","进步","吗"],
+    acceptedOrders:[["你","觉得","咱们","汉语","有","进步","吗"]] },
+  { bab:3, meaning:"Ayah sekarang setiap hari kerja minimal dua jam.", tiles:["爸爸","现在","每天","最少","工作","两个","小时"],
+    acceptedOrders:[
+      ["爸爸","现在","每天","最少","工作","两个","小时"],
+      ["现在","爸爸","每天","最少","工作","两个","小时"]
+    ] },
+  { bab:2, meaning:"Katanya kamu kemarin nonton TV sampai sangat larut.", tiles:["听说","你","昨天","很晚","才","看","电视"],
+    acceptedOrders:[["听说","你","昨天","很晚","才","看","电视"]] },
+  { bab:4, meaning:"Di luar sangat dingin, kamu harus pakai topi.", tiles:["外边","很冷","你","一定要","戴上","帽子"],
+    acceptedOrders:[["外边","很冷","你","一定要","戴上","帽子"]] },
+  { bab:7, meaning:"Ohya, aku mau pesan delivery di restoran cepat saji terkenal itu.", tiles:["对了","我要","在","那家","有名的","快餐店","点外卖"],
+    acceptedOrders:[["对了","我要","在","那家","有名的","快餐店","点外卖"]] },
+  { bab:6, meaning:"Kita berbagi rata sepuluh orang, boleh?", tiles:["咱们","十个人","AA制","好吗"],
+    acceptedOrders:[["咱们","十个人","AA制","好吗"]] },
+  { bab:6, meaning:"Aku meletakkan tas di sebelah meja.", tiles:["我","把","书包","放在","桌子","旁边"],
+    acceptedOrders:[["我","把","书包","放在","桌子","旁边"]] },
+  { bab:2, meaning:"Adik perempuan belajar dengan giat setiap hari.", tiles:["妹妹","每天","努力地","学习"],
+    acceptedOrders:[
+      ["妹妹","每天","努力地","学习"],
+      ["每天","妹妹","努力地","学习"]
+    ] },
+  { bab:3, meaning:"Apakah kamu sering melihat berita?", tiles:["你","是不是","常常","看","新闻"],
+    acceptedOrders:[["你","是不是","常常","看","新闻"]] },
+  { bab:5, meaning:"Ibu membawa pergi dompetku.", tiles:["妈妈","带走","了","我的","钱包"],
+    acceptedOrders:[["妈妈","带走","了","我的","钱包"]] },
+  { bab:7, meaning:"Bisakah kamu bantu tukarkan yang agak pendek?", tiles:["你","能不能","帮我","换","一件","短点儿的"],
+    acceptedOrders:[["你","能不能","帮我","换","一件","短点儿的"]] },
+  { bab:8, meaning:"Jaket kapas itu sekitar tiga ratus yuan.", tiles:["那件","棉衣","差不多","三百","块钱"],
+    acceptedOrders:[["那件","棉衣","差不多","三百","块钱"]] },
+  { bab:1, meaning:"Dia membawakan aku banyak sekali makanan enak.", tiles:["她","给","我","带了","很多","好吃的"],
+    acceptedOrders:[
+      ["她","给","我","带了","很多","好吃的"],
+      ["她","带了","很多","好吃的","给","我"]
+    ] }
+];
+
+/* ======================================================================
+   GABUNGKAN & BERI TIPE
+   ====================================================================== */
+const ALL_QUESTIONS_BASE = [
+  ...TYPING.map((item, i) => ({ type:"typing", origIndex:i, ...item })),
+  ...HANZI.map((item, i) => ({ type:"hanzi", origIndex:i, ...item }))
+];
+const TOTAL_TYPING = TYPING.length;   // 10
+const TOTAL_HANZI = HANZI.length;     // 15
+const TOTAL_SOAL = TOTAL_TYPING + TOTAL_HANZI; // 25
+
+const BAB_TITLES = {
+  1:"给 / 送 / 发 / 寄, 要, 还是",
+  2:"才, S+Predikat kecil, 地",
+  3:"Durasi, reduplikasi, 是不是",
+  4:"只好, 给 (preposisi), pelengkap hasil",
+  5:"Pelengkap hasil lanjutan, 又...又, 多/几",
+  6:"Perbandingan 跟/和, ...好吗, 把",
+  7:"的, 有点儿, 一点儿",
+  8:"左右, 才 (penekanan), 差不多, 还可以, 了",
+};
+
+/* ======================================================================
+   KONFIGURASI BACKEND
+   ====================================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbyMjjEZ-9rHmJjWQQMPTg6Cz3vtbb5c6RoI1NoaNgvavT5h6XUcI771_YB_o8EnKROI/exec";
+
+/* ======================================================================
+   STATE & UTILS
+   ====================================================================== */
+const STORAGE_KEY = "mandarinfy_midterm_session_v1";
+
+let USER = {nama:"", kelas:""};
+let examQuestions = [];       // urutan teracak untuk sesi ini (referensi ke ALL_QUESTIONS_BASE)
+let userTypingAnswers = {};   // key: soal index dalam examQuestions -> text
+let hanziState = {};          // key: soal index dalam examQuestions -> {tiles, assembled}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function showScreen(id){
+  ["screen-login","screen-exam","screen-result"].forEach(s=>{
+    document.getElementById(s).classList.toggle("hidden", s!==id);
+  });
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ======================================================================
+   PERSISTENSI SESI (supaya refresh tidak mengulang dari awal)
+   ====================================================================== */
+function saveActiveSession(){
+  const payload = {
+    submitted: false,
+    user: USER,
+    examQuestions,
+    typingAnswers: userTypingAnswers,
+    hanziState
+  };
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }catch(e){ /* abaikan */ }
+}
+function saveSubmittedSession(result){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ submitted:true, result })); }catch(e){ /* abaikan */ }
+}
+function clearSession(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){ /* abaikan */ }
+}
+
+function tryRestoreSession(){
+  let raw;
+  try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ return; }
+  if(!raw) return;
+  let data;
+  try{ data = JSON.parse(raw); }catch(e){ clearSession(); return; }
+
+  if(data.submitted && data.result){
+    fillResultScreen(data.result);
+    showScreen("screen-result");
+    return;
+  }
+  if(data.user && data.examQuestions){
+    USER = data.user;
+    examQuestions = data.examQuestions;
+    userTypingAnswers = data.typingAnswers || {};
+    hanziState = data.hanziState || {};
+    document.getElementById("exam-userinfo").innerHTML = `<b>${escapeHtml(USER.nama)}</b> · ${escapeHtml(USER.kelas)}`;
+    renderExamDOM();
+    showScreen("screen-exam");
+    toast("Ujianmu dilanjutkan dari progres terakhir.");
+  }
+}
+
+/* ======================================================================
+   LOGIN
+   ====================================================================== */
+document.getElementById("btn-start").addEventListener("click", ()=>{
+  const nama = document.getElementById("in-nama").value.trim();
+  const kelas = document.getElementById("in-kelas").value.trim();
+  const err = document.getElementById("login-err");
+  if(!nama || !kelas){ err.style.display = "block"; return; }
+  err.style.display = "none";
+  USER = {nama, kelas};
+  document.getElementById("exam-userinfo").innerHTML = `<b>${escapeHtml(nama)}</b> · ${escapeHtml(kelas)}`;
+  buildFreshExam();
+  showScreen("screen-exam");
+});
+
+document.getElementById("btn-back-login").addEventListener("click", ()=>{
+  clearSession();
+  document.getElementById("in-nama").value="";
+  document.getElementById("in-kelas").value="";
+  showScreen("screen-login");
+});
+
+/* ======================================================================
+   BUILD & RENDER EXAM
+   ====================================================================== */
+function buildFreshExam(){
+  userTypingAnswers = {};
+  hanziState = {};
+  examQuestions = shuffle(ALL_QUESTIONS_BASE);
+  examQuestions.forEach((q, i) => {
+    if(q.type === "hanzi"){ hanziState[i] = { tiles: shuffle(q.tiles), assembled: [] }; }
+  });
+  renderExamDOM();
+  saveActiveSession();
+}
+
+function renderExamDOM(){
+  const mount = document.getElementById("quiz-mount");
+  mount.innerHTML = "";
+  examQuestions.forEach((q, i) => {
+    const no = i + 1;
+    const card = document.createElement("div");
+    card.className = "qcard writing-card";
+    if(q.type === "typing"){
+      card.innerHTML = `
+        <div class="qhead">
+          <div class="qnum">${no}.</div>
+          <span class="type-badge tp">打字 · Translate</span>
+        </div>
+        <div class="qtext">${q.prompt}<span class="hint">Bab ${q.bab} · ${BAB_TITLES[q.bab]}</span></div>
+        <textarea placeholder="Tulis jawabanmu dalam bahasa Mandarin di sini…" data-tidx="${i}">${escapeHtml(userTypingAnswers[i] || "")}</textarea>
+      `;
+      mount.appendChild(card);
+      card.querySelector("textarea").addEventListener("input", (e) => {
+        userTypingAnswers[i] = e.target.value;
+        updateProgress();
+        saveActiveSession();
+      });
+    }else{
+      card.innerHTML = `
+        <div class="qhead">
+          <div class="qnum">${no}.</div>
+          <span class="type-badge hz">✂ Susun Hanzi</span>
+        </div>
+        <div class="qtext">Susun jadi kalimat: <b>"${escapeHtml(q.meaning)}"</b><span class="hint">Bab ${q.bab} · ${BAB_TITLES[q.bab]}</span></div>
+        <div class="assembled-row" id="assembled-${i}"></div>
+        <div class="pool-row" id="pool-${i}"></div>
+        <div class="hanzi-tools"><button type="button" data-reset="${i}">↺ Reset</button></div>
+      `;
+      mount.appendChild(card);
+      renderHanziQuestion(i);
+      card.querySelector(`[data-reset="${i}"]`).addEventListener("click", () => {
+        hanziState[i].assembled = [];
+        renderHanziQuestion(i);
+        updateProgress();
+        saveActiveSession();
+      });
+    }
+  });
+  updateProgress();
+}
+
+function renderHanziQuestion(i){
+  const state = hanziState[i];
+  const assembledMount = document.getElementById(`assembled-${i}`);
+  const poolMount = document.getElementById(`pool-${i}`);
+
+  assembledMount.innerHTML = "";
+  if(state.assembled.length === 0){
+    assembledMount.innerHTML = `<span class="placeholder">Klik kata di bawah untuk menyusun kalimat…</span>`;
+  }else{
+    state.assembled.forEach((word, pos) => {
+      const chip = document.createElement("div");
+      chip.className = "tile in-answer";
+      chip.textContent = word;
+      chip.addEventListener("click", () => {
+        state.assembled.splice(pos, 1);
+        renderHanziQuestion(i);
+        updateProgress();
+        saveActiveSession();
+      });
+      assembledMount.appendChild(chip);
+    });
+  }
+
+  poolMount.innerHTML = "";
+  const usedCounts = {};
+  state.assembled.forEach(w => usedCounts[w] = (usedCounts[w]||0)+1);
+  const shownCounts = {};
+  state.tiles.forEach(word => {
+    shownCounts[word] = (shownCounts[word]||0)+1;
+    if(shownCounts[word] <= (usedCounts[word]||0)) return;
+    const chip = document.createElement("div");
+    chip.className = "tile";
+    chip.textContent = word;
+    chip.addEventListener("click", () => {
+      state.assembled.push(word);
+      renderHanziQuestion(i);
+      updateProgress();
+      saveActiveSession();
+    });
+    poolMount.appendChild(chip);
+  });
+}
+
+function updateProgress(){
+  let done = 0;
+  examQuestions.forEach((q, i) => {
+    if(q.type === "typing"){
+      if(userTypingAnswers[i] && userTypingAnswers[i].trim() !== "") done++;
+    }else{
+      const st = hanziState[i];
+      if(st && st.assembled.length === st.tiles.length && st.tiles.length > 0) done++;
+    }
+  });
+  document.getElementById("progress-text").textContent = `${done} dari ${TOTAL_SOAL} soal terjawab`;
+  document.getElementById("progress-fill").style.width = `${(done/TOTAL_SOAL)*100}%`;
+}
+
+/* ======================================================================
+   SUBMIT & PENILAIAN
+   ====================================================================== */
+document.getElementById("btn-submit").addEventListener("click", async () => {
+  let doneCount = 0;
+  examQuestions.forEach((q, i) => {
+    if(q.type === "typing"){ if(userTypingAnswers[i] && userTypingAnswers[i].trim() !== "") doneCount++; }
+    else{ const st = hanziState[i]; if(st && st.assembled.length === st.tiles.length && st.tiles.length>0) doneCount++; }
+  });
+  if(doneCount < TOTAL_SOAL){
+    if(!confirm(`Baru ${doneCount} dari ${TOTAL_SOAL} soal yang dijawab. Tetap kumpulkan?`)) return;
+  }
+
+  let skorTyping = 0, skorHanzi = 0;
+  const perQuestionResult = []; // { no, type, correct(bool), ... }
+  const typingList = [];
+  const hanziList = [];
+
+  examQuestions.forEach((q, i) => {
+    const no = i + 1;
+    if(q.type === "typing"){
+      const raw = userTypingAnswers[i] || "";
+      const norm = normalizeText(raw);
+      const isCorrect = q.accepted.some(acc => normalizeText(acc) === norm) && norm !== "";
+      if(isCorrect) skorTyping++;
+      perQuestionResult.push({
+        no, type:"typing", correct:isCorrect,
+        prompt:q.prompt, chosen: raw || "(kosong)", correctExample: q.accepted[0]
+      });
+      typingList.push({ bab:q.bab, prompt:q.prompt, jawaban: raw });
+    }else{
+      const st = hanziState[i];
+      const assembled = st ? st.assembled : [];
+      const isCorrect = q.acceptedOrders.some(order =>
+        order.length === assembled.length && order.every((w,pos)=> w === assembled[pos])
+      );
+      if(isCorrect) skorHanzi++;
+      const jawabanText = assembled.join("");
+      perQuestionResult.push({
+        no, type:"hanzi", correct:isCorrect,
+        prompt:q.meaning, chosen: jawabanText || "(kosong)", correctExample: q.acceptedOrders[0].join("")
+      });
+      hanziList.push({ bab:q.bab, prompt:q.meaning, jawaban: jawabanText });
+    }
+  });
+
+  const totalGabungan = skorTyping + skorHanzi;
+
+  const result = {
+    nama: USER.nama, kelas: USER.kelas, waktu: new Date().toISOString(),
+    totalGabungan, totalSoal: TOTAL_SOAL,
+    typing: { benar: skorTyping, total: TOTAL_TYPING },
+    hanzi: { benar: skorHanzi, total: TOTAL_HANZI },
+    perQuestionResult
+  };
+
+  const submission = {
+    nama: USER.nama, kelas: USER.kelas,
+    skorTyping, totalTyping: TOTAL_TYPING,
+    skorHanzi, totalHanzi: TOTAL_HANZI,
+    totalGabungan, totalSoal: TOTAL_SOAL,
+    writing: typingList,   // -> kolom W1..W10 (ditampilkan di panel pengawas)
+    hanzi: hanziList,      // -> kolom H1..H15 (arsip, tidak ditampilkan di panel pengawas)
+    waktu: result.waktu
+  };
+
+  document.getElementById("btn-submit").disabled = true;
+  document.getElementById("btn-submit").textContent = "Mengirim…";
+
+  try{
+    if(!API_URL || API_URL.includes("PASTE_URL")){ throw new Error("API_URL belum diisi"); }
+    await fetch(API_URL, { method:"POST", body: JSON.stringify(submission) });
+    toast("Jawaban berhasil dikumpulkan!");
+  }catch(e){
+    console.error("Gagal mengirim ke backend:", e);
+    toast("Gagal mengirim ke server. Cek koneksi internet / konfigurasi API_URL.");
+  }
+
+  fillResultScreen(result);
+  saveSubmittedSession(result);
+  showScreen("screen-result");
+});
+
+function fillResultScreen(result){
+  document.getElementById("res-score").textContent = result.totalGabungan;
+  document.querySelector(".seal-big .of").textContent = `/ ${result.totalSoal} BENAR`;
+  document.getElementById("res-name").textContent = result.nama;
+  document.getElementById("rc-name").textContent = result.nama;
+  document.getElementById("rc-kelas").textContent = result.kelas;
+  document.getElementById("rc-typing").textContent = `${result.typing.benar} / ${result.typing.total}`;
+  document.getElementById("rc-hanzi").textContent = `${result.hanzi.benar} / ${result.hanzi.total}`;
+  document.getElementById("rc-total").textContent = `${result.totalGabungan} / ${result.totalSoal}`;
+  document.getElementById("rc-time").textContent = new Date(result.waktu).toLocaleString("id-ID");
+
+  const ovMount = document.getElementById("overview-grid");
+  ovMount.innerHTML = "";
+  result.perQuestionResult.forEach(r => {
+    const badge = document.createElement("div");
+    badge.className = "ov-badge " + (r.correct ? "correct" : "wrong");
+    badge.textContent = r.no;
+    badge.title = r.correct ? "Benar" : "Salah — klik untuk detail";
+    if(!r.correct){
+      badge.addEventListener("click", () => {
+        const target = document.getElementById(`wrong-detail-${r.no}`);
+        if(target){ target.scrollIntoView({behavior:"smooth", block:"center"}); target.style.borderColor = "var(--red)"; }
+      });
+    }
+    ovMount.appendChild(badge);
+  });
+
+  const wrapEl = document.getElementById("wrong-wrap");
+  const wrongOnes = result.perQuestionResult.filter(r => !r.correct);
+  if(wrongOnes.length === 0){
+    wrapEl.innerHTML = `<div class="all-correct-note">🎉 Semua jawaban benar! Kerja bagus.</div>`;
+  }else{
+    let html = `<h3>Detail Soal yang Salah (${wrongOnes.length} dari ${result.totalSoal})</h3>`;
+    wrongOnes.forEach(r => {
+      const label = r.type === "typing" ? "打字 · Translate" : "✂ Susun Hanzi";
+      html += `<div class="wrong-item" id="wrong-detail-${r.no}">
+        <span class="no">No. ${r.no}</span><span class="q">[${label}] ${escapeHtml(r.prompt)}</span>
+        <div class="compare">Jawabanmu: <b>${escapeHtml(r.chosen)}</b><br>Salah satu contoh benar: <span class="ok">${escapeHtml(r.correctExample)}</span></div>
+      </div>`;
+    });
+    wrapEl.innerHTML = html;
+  }
+}
+
+/* ======================================================================
+   INIT
+   ====================================================================== */
+tryRestoreSession();
+</script>
+</body>
+</html>
