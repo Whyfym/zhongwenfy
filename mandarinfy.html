@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>句子地图 · Peta Rumus Kalimat Mandarin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EEE1;
+    --paper-alt:#EAE1CC;
+    --card:#FBF8F0;
+    --ink:#232C36;
+    --ink-soft:#5B6470;
+    --ink-faint:#8A93A0;
+    --line:#D9CFB6;
+
+    --seal:#C1440E;      /* 火 fire */
+    --seal-soft:#F6E1D3;
+    --seal-deep:#8F3009;
+
+    --gold:#B0821E;      /* 土 earth */
+    --gold-soft:#F3E9CB;
+    --gold-deep:#7D5B10;
+
+    --jade:#3B6B52;      /* 木 wood */
+    --jade-soft:#DCEAE1;
+    --jade-deep:#254A38;
+
+    --metal:#4A5C8A;     /* 金 metal */
+    --metal-soft:#E1E5F1;
+    --metal-deep:#303F66;
+
+    --water:#1F5B66;     /* 水 water */
+    --water-soft:#DBEBEC;
+    --water-deep:#123B43;
+
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(115deg, rgba(0,0,0,0.014) 0px, rgba(0,0,0,0.014) 1px, transparent 1px, transparent 5px),
+      radial-gradient(circle at 15% 0%, #F8F4E9 0%, var(--paper) 55%, var(--paper-alt) 100%);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3,.zh{font-family:'Noto Serif SC', serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  a{color:inherit;}
+  button{font:inherit;}
+
+  ::selection{background:var(--seal-soft); color:var(--seal-deep);}
+
+  :focus-visible{
+    outline:3px solid var(--metal);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  /* ---------- LAYOUT SHELL ---------- */
+  .wrap{max-width:1200px; margin:0 auto; padding:0 24px 90px;}
+
+  header.top{
+    padding:46px 24px 10px;
+    max-width:1200px; margin:0 auto;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--seal-deep); background:var(--seal-soft);
+    padding:6px 14px; border-radius:999px; margin-bottom:18px;
+    border:1px solid rgba(193,68,14,0.25);
+  }
+  .eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--seal);}
+
+  h1.title{
+    font-size:clamp(30px, 5vw, 52px);
+    font-weight:900;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  h1.title .zh-big{color:var(--seal); font-size:1.05em;}
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:clamp(15px,2vw,18px);
+    max-width:640px; margin:0 auto 6px;
+  }
+  .subtitle2{
+    color:var(--ink-faint);
+    font-size:13px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- HERO SVG "SENTENCE LINE" ---------- */
+  .hero{
+    max-width:1200px; margin:34px auto 0; padding:0 12px;
+  }
+  .hero-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:20px 8px 10px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.03), 0 20px 40px -30px rgba(35,44,54,0.35);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 92% 8%, rgba(193,68,14,0.06), transparent 40%);
+    pointer-events:none;
+  }
+  svg.trainline{width:100%; height:auto; display:block;}
+  .track{fill:none; stroke:var(--ink-faint); stroke-width:2; stroke-dasharray:1 7; stroke-linecap:round;}
+  .spur{fill:none; stroke:var(--metal); stroke-width:2; stroke-dasharray:1 6; stroke-linecap:round; opacity:.7;}
+  .station-node circle.ring{fill:var(--card); stroke-width:3;}
+  .station-node text.num{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px;}
+  .station-node text.zh{font-family:'Noto Serif SC',serif; font-weight:700;}
+  .station-node text.label{font-family:'Inter',sans-serif; font-size:11px; font-weight:600;}
+  .station-node{cursor:pointer;}
+  .station-node:hover circle.ring, .station-node:focus circle.ring{filter:brightness(0.94);}
+  .station-node:hover text.label{text-decoration:underline;}
+
+  .hero-hint{
+    text-align:center; font-size:13px; color:var(--ink-faint);
+    margin:2px 0 4px; font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- TOC + CONTENT GRID ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:34px;
+    margin-top:44px;
+  }
+  nav.toc{
+    align-self:start;
+    position:sticky; top:18px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  nav.toc a{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px; border-radius:10px;
+    text-decoration:none; font-size:13.5px; font-weight:600;
+    color:var(--ink-soft);
+    border:1px solid transparent;
+    transition:background .15s, border-color .15s, color .15s;
+  }
+  nav.toc a .chip{
+    width:20px; height:20px; border-radius:6px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC',serif; font-size:11px; font-weight:700; color:#fff;
+  }
+  nav.toc a:hover{background:var(--paper-alt); color:var(--ink);}
+
+  main.stations{min-width:0;}
+
+  section.station{
+    scroll-margin-top:18px;
+    margin-bottom:26px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--card);
+    overflow:hidden;
+  }
+  .station-head{
+    display:flex; align-items:center; gap:14px;
+    padding:18px 20px;
+    cursor:pointer; user-select:none;
+    list-style:none;
+  }
+  .station-head::-webkit-details-marker{display:none;}
+  .station-head .badge{
+    flex:0 0 auto;
+    width:38px; height:38px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC',serif; font-weight:900; font-size:16px; color:#fff;
+  }
+  .station-head .titles{flex:1; min-width:0;}
+  .station-head h2{margin:0; font-size:18px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .station-head h2 .zh-tag{font-size:15px; opacity:.7;}
+  .station-head p{margin:2px 0 0; font-size:13px; color:var(--ink-soft);}
+  .station-head .chev{
+    flex:0 0 auto; width:26px; height:26px; color:var(--ink-faint);
+    transition:transform .2s ease;
+  }
+  details[open] > .station-head .chev{transform:rotate(180deg);}
+  details[open] > .station-head{border-bottom:1px solid var(--line);}
+
+  .station-body{padding:20px; display:flex; flex-direction:column; gap:16px;}
+
+  /* item card */
+  .item{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fff;
+    padding:16px 18px;
+  }
+  .item-top{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .bab-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+    padding:3px 9px; border-radius:999px; white-space:nowrap;
+  }
+  .rumus{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px; font-weight:700;
+    background:var(--paper-alt);
+    border-radius:8px;
+    padding:9px 12px;
+    display:inline-block;
+    margin:2px 0 10px;
+    line-height:1.55;
+  }
+  .arti{font-size:14.5px; margin:0 0 10px;}
+  .arti b{color:var(--ink);}
+  .note{font-size:13px; color:var(--ink-soft); margin:0 0 10px; padding-left:12px; border-left:2px solid var(--line);}
+  .examples{display:flex; flex-direction:column; gap:6px;}
+  .ex{
+    display:flex; gap:10px; align-items:baseline; font-size:14px;
+    flex-wrap:wrap;
+  }
+  .ex .cn{font-family:'Noto Serif SC',serif; font-weight:600; white-space:nowrap;}
+  .ex .id{color:var(--ink-soft); font-size:13.5px;}
+  .ex::before{content:"›"; color:var(--ink-faint); font-weight:700;}
+
+  /* table item */
+  .tbl-wrap{overflow-x:auto;}
+  table.gram{border-collapse:collapse; width:100%; font-size:13.5px;}
+  table.gram th, table.gram td{
+    text-align:left; padding:8px 12px; border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.gram th{
+    font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--ink-faint); font-weight:700;
+  }
+  table.gram td:first-child{font-family:'Noto Serif SC',serif; font-weight:700; white-space:nowrap;}
+  table.gram tr:last-child td{border-bottom:none;}
+
+  /* spectrum item */
+  .spectrum-row{
+    display:flex; align-items:stretch; gap:0; overflow-x:auto; padding-top:4px;
+  }
+  .spectrum-step{
+    flex:1; min-width:140px;
+    padding:12px 14px; position:relative;
+    border-right:1px dashed var(--line);
+  }
+  .spectrum-step:last-child{border-right:none;}
+  .spectrum-step .lvl{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px;}
+  .spectrum-step .desc{font-size:12px; color:var(--ink-soft); margin:3px 0 8px;}
+  .spectrum-step .ex-cn{font-family:'Noto Serif SC',serif; font-weight:600; font-size:13.5px;}
+  .spectrum-step .ex-id{font-size:12px; color:var(--ink-faint);}
+  .spectrum-arrow{
+    text-align:center; font-size:11px; color:var(--ink-faint);
+    font-family:'JetBrains Mono',monospace; margin-top:6px;
+  }
+
+  /* section color theming via data-color */
+  section.station[data-color="seal"] .badge{background:var(--seal);}
+  section.station[data-color="seal"] .bab-tag{background:var(--seal-soft); color:var(--seal-deep);}
+  section.station[data-color="gold"] .badge{background:var(--gold);}
+  section.station[data-color="gold"] .bab-tag{background:var(--gold-soft); color:var(--gold-deep);}
+  section.station[data-color="jade"] .badge{background:var(--jade);}
+  section.station[data-color="jade"] .bab-tag{background:var(--jade-soft); color:var(--jade-deep);}
+  section.station[data-color="metal"] .badge{background:var(--metal);}
+  section.station[data-color="metal"] .bab-tag{background:var(--metal-soft); color:var(--metal-deep);}
+  section.station[data-color="water"] .badge{background:var(--water);}
+  section.station[data-color="water"] .bab-tag{background:var(--water-soft); color:var(--water-deep);}
+
+  /* ---------- FOOTER CHEAT SHEET ---------- */
+  .cheat{
+    margin-top:50px;
+    border-radius:20px;
+    background:linear-gradient(160deg, var(--ink) 0%, #1a212a 100%);
+    color:#F3EEE1;
+    padding:30px 26px 34px;
+    text-align:center;
+  }
+  .cheat h3{margin:0 0 6px; font-size:20px;}
+  .cheat p.lead{color:#B8C0CB; font-size:13.5px; margin:0 0 20px;}
+  .cheat-formula{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(11px,2vw,15px);
+    line-height:2.1;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px;
+    padding:16px 18px;
+    display:inline-block;
+    max-width:100%;
+    overflow-x:auto;
+    text-align:left;
+    color:#F0E9D6;
+  }
+  .cheat-formula .k1{color:#E8956B;}
+  .cheat-formula .k2{color:#8FD6B0;}
+  .cheat-formula .k3{color:#9FB4E8;}
+  .cheat-formula .k4{color:#F0C87A;}
+
+  footer.credit{
+    text-align:center; font-size:12px; color:var(--ink-faint);
+    margin-top:22px; font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{
+      position:static;
+      flex-direction:row; overflow-x:auto;
+      padding-bottom:6px; gap:8px;
+    }
+    nav.toc a{flex:0 0 auto;}
+    nav.toc a span.txt{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="eyebrow"><span class="dot"></span> Catatan HSK 2 · dirangkum jadi satu peta</span>
+  <h1 class="title">句子地图<br><span class="zh-big">S</span> + <span class="zh-big">V</span> + <span class="zh-big">O</span> — Peta Rumus Kalimat Mandarin</h1>
+  <p class="subtitle">Satu kalimat Mandarin itu seperti pohon: batangnya cuma Subjek–Predikat(Kata Kerja)–Objek, tapi di sepanjang batang itu ada tempat-tempat untuk menyisipkan cabang &mdash; kata bantu, pelengkap, partikel, sampai klausa pengandaian.</p>
+  <p class="subtitle2">Klik setiap stasiun di bawah, atau gulir ke bawah &nbsp;→</p>
+</header>
+
+<div class="hero">
+  <div class="hero-card">
+    <svg class="trainline" viewBox="0 0 1200 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path class="track" d="M60,110 C140,70 160,70 220,80 C280,90 320,150 380,140 C440,130 480,90 540,100 C600,110 640,150 700,120 C760,90 800,60 860,85 C920,110 960,140 1020,115 C1060,98 1090,88 1120,90"></path>
+      <path class="spur" d="M700,120 C700,80 700,50 700,26"></path>
+
+      <!-- station 0 -->
+      <g class="station-node" data-target="sec-0">
+        <circle class="ring" cx="60" cy="110" r="26" stroke="#C1440E"></circle>
+        <text x="60" y="107" text-anchor="middle" class="zh" fill="#C1440E" font-size="14">句首</text>
+        <text x="60" y="121" text-anchor="middle" class="num" fill="#C1440E">0</text>
+        <text x="60" y="150" text-anchor="middle" class="label" fill="#5B6470">Klausa Depan</text>
+      </g>
+      <!-- station 1 -->
+      <g class="station-node" data-target="sec-1">
+        <circle class="ring" cx="220" cy="80" r="26" stroke="#B0821E"></circle>
+        <text x="220" y="77" text-anchor="middle" class="zh" fill="#B0821E" font-size="14">主语</text>
+        <text x="220" y="91" text-anchor="middle" class="num" fill="#B0821E">1</text>
+        <text x="220" y="120" text-anchor="middle" class="label" fill="#5B6470">Subjek</text>
+      </g>
+      <!-- station 2 -->
+      <g class="station-node" data-target="sec-2">
+        <circle class="ring" cx="380" cy="140" r="26" stroke="#3B6B52"></circle>
+        <text x="380" y="137" text-anchor="middle" class="zh" fill="#3B6B52" font-size="14">状语</text>
+        <text x="380" y="151" text-anchor="middle" class="num" fill="#3B6B52">2</text>
+        <text x="380" y="180" text-anchor="middle" class="label" fill="#5B6470">Sebelum Kata Kerja</text>
+      </g>
+      <!-- station 3 -->
+      <g class="station-node" data-target="sec-3">
+        <circle class="ring" cx="540" cy="100" r="28" stroke="#4A5C8A" stroke-width="4"></circle>
+        <text x="540" y="96" text-anchor="middle" class="zh" fill="#4A5C8A" font-size="15" font-weight="900">谓语V</text>
+        <text x="540" y="112" text-anchor="middle" class="num" fill="#4A5C8A">3</text>
+        <text x="540" y="142" text-anchor="middle" class="label" fill="#232C36" font-weight="700">Kata Kerja</text>
+      </g>
+      <!-- special spur -->
+      <g class="station-node" data-target="sec-7">
+        <circle class="ring" cx="700" cy="26" r="22" stroke="#4A5C8A" stroke-dasharray="3 2"></circle>
+        <text x="700" y="23" text-anchor="middle" class="zh" fill="#4A5C8A" font-size="12">特殊</text>
+        <text x="700" y="36" text-anchor="middle" class="num" fill="#4A5C8A" font-size="11">+</text>
+        <text x="700" y="-2" text-anchor="middle" class="label" fill="#5B6470" font-size="10">Struktur Khusus (把 dll)</text>
+      </g>
+      <!-- station 4 -->
+      <g class="station-node" data-target="sec-4">
+        <circle class="ring" cx="700" cy="120" r="26" stroke="#1F5B66"></circle>
+        <text x="700" y="117" text-anchor="middle" class="zh" fill="#1F5B66" font-size="14">补语</text>
+        <text x="700" y="131" text-anchor="middle" class="num" fill="#1F5B66">4</text>
+        <text x="700" y="160" text-anchor="middle" class="label" fill="#5B6470">Setelah Kata Kerja</text>
+      </g>
+      <!-- station 5 -->
+      <g class="station-node" data-target="sec-5">
+        <circle class="ring" cx="860" cy="85" r="26" stroke="#B0821E"></circle>
+        <text x="860" y="82" text-anchor="middle" class="zh" fill="#B0821E" font-size="14">宾语</text>
+        <text x="860" y="96" text-anchor="middle" class="num" fill="#B0821E">5</text>
+        <text x="860" y="125" text-anchor="middle" class="label" fill="#5B6470">Objek</text>
+      </g>
+      <!-- station 6 -->
+      <g class="station-node" data-target="sec-6">
+        <circle class="ring" cx="1020" cy="115" r="26" stroke="#3B6B52"></circle>
+        <text x="1020" y="112" text-anchor="middle" class="zh" fill="#3B6B52" font-size="14">语气词</text>
+        <text x="1020" y="126" text-anchor="middle" class="num" fill="#3B6B52">6</text>
+        <text x="1020" y="155" text-anchor="middle" class="label" fill="#5B6470">Partikel Akhir</text>
+      </g>
+    </svg>
+    <p class="hero-hint">urutan baca dari kiri ke kanan &mdash; cabang di atas (特殊) menandakan pola yang mengubah susunan normal</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="Daftar bagian"></nav>
+    <main class="stations" id="stations"></main>
+  </div>
+
+  <div class="cheat">
+    <h3>Rumus rangkuman &mdash; satu baris</h3>
+    <p class="lead">Kalau semua cabang dipasang sekaligus (jarang terjadi bersamaan semua, tapi begini urutannya):</p>
+    <div class="cheat-formula">
+      [<span class="k1">Klausa: 如果/虽然/为了/当...的时候</span>] ，<br>
+      S + [<span class="k2">把+O</span>] + [<span class="k3">才/就要/要/应该/得/只好/正在/一边/адj+地</span>] + <b>V</b> + [<span class="k4">了/过/得+adj/好·完·上·下·到/来·去/durasi/次数/极了</span>] + O + [<span class="k1">了/吗/吧/呢</span>] ？
+    </div>
+  </div>
+</div>
+
+<footer class="credit">disusun dari catatan HSK 2 (BAB 1–15) · klik setiap stasiun untuk membuka cabangnya</footer>
+
+<script>
+const DATA = [
+  {
+    id:'sec-0', color:'seal', num:0, zh:'句首', label:'Sebelum Kalimat',
+    sub:'Klausa pembuka: syarat, sebab, tujuan, waktu, pertentangan — muncul sebelum S',
+    items:[
+      {type:'card', bab:'BAB 1 · 11', rumus:'如果 / 要是 + syarat，(的话) 就 + hasil',
+        arti:'Kalau / jika A terjadi, maka B.',
+        note:'如果 lebih formal (tulisan), 要是 lebih santai (lisan). 的话 opsional, membuat kalimat lebih alami.',
+        contoh:[
+          {cn:'如果下雨，我就不出去。', id:'Kalau hujan, aku tidak keluar.'},
+          {cn:'要是你累了，就休息吧。', id:'Kalau kamu lelah, istirahatlah.'},
+          {cn:'要是明天你有空的话，我们就一起去看电影。', id:'Kalau besok kamu senggang, kita nonton bareng.'}
+        ]},
+      {type:'card', bab:'BAB 10', rumus:'虽然 + fakta，但是 / 可是 / 还是 + hasil',
+        arti:'Walaupun A, tetap/namun terjadi B (bertentangan dengan harapan).',
+        note:'但是 = netral/formal. 可是 = lisan, lebih emosional. 还是 = tetap saja terjadi.',
+        contoh:[
+          {cn:'虽然今天下雨，但是我还是去上课。', id:'Walau hari ini hujan, aku tetap pergi kelas.'},
+          {cn:'虽然他很年轻，但是经验很丰富。', id:'Walau dia masih muda, pengalamannya sangat banyak.'}
+        ]},
+      {type:'card', bab:'BAB 9', rumus:'为了 + tujuan，S + V',
+        arti:'Demi / untuk mencapai tujuan tertentu — ada usaha atau pengorbanan.',
+        contoh:[
+          {cn:'为了学习汉语，我每天练习。', id:'Demi belajar Mandarin, aku latihan tiap hari.'},
+          {cn:'为了健康，他每天跑步。', id:'Demi kesehatan, dia lari tiap hari.'}
+        ]},
+      {type:'card', bab:'BAB 15', rumus:'当 + S + V/adj + 的时候，S + V',
+        arti:'Ketika / saat / sewaktu sesuatu terjadi.',
+        note:'Kalau subjek klausa 1 dan 2 sama, subjek kedua boleh tidak diulang. Dalam percakapan santai, 当 boleh dihilangkan.',
+        contoh:[
+          {cn:'当我吃饭的时候，他给我打电话。', id:'Saat aku makan, dia menelponku.'},
+          {cn:'当我到学校的时候，老师已经来了。', id:'Saat aku sampai sekolah, guru sudah datang.'}
+        ]},
+      {type:'card', bab:'implisit di banyak contoh', rumus:'因为 + sebab，所以 + akibat',
+        arti:'Karena A, maka terjadi B.',
+        contoh:[
+          {cn:'因为天气太冷了，我马上洗了一个热水澡。', id:'Karena cuaca sangat dingin, aku segera mandi air hangat.'},
+          {cn:'因为他生病了，所以今天没来。', id:'Karena dia sakit, makanya hari ini tidak datang.'}
+        ]}
+    ]
+  },
+  {
+    id:'sec-1', color:'gold', num:1, zh:'主语', label:'Subjek (S)',
+    sub:'Siapa/apa yang melakukan atau dibicarakan',
+    items:[
+      {type:'card', bab:'umum', rumus:'kata benda / nama orang', arti:'Pelaku atau topik kalimat.',
+        contoh:[{cn:'老师说...', id:'Guru berkata...'},{cn:'妈妈做饭。', id:'Ibu memasak.'}]},
+      {type:'card', bab:'umum', rumus:'kata ganti: 我 / 你 / 他 / 她 / 我们 / 他们', arti:'Pengganti orang atau benda yang sudah jelas.',
+        contoh:[{cn:'我明天要去。', id:'Aku besok mau pergi.'}]},
+      {type:'card', bab:'BAB 12', rumus:'kata ganti / kata benda + 这儿 / 那儿', arti:'Menunjukkan tempat milik seseorang (di tempatku / ditempatmu).',
+        contoh:[
+          {cn:'我这儿有很多书。', id:'Di tempatku ada banyak buku.'},
+          {cn:'老师那儿没有人。', id:'Di tempat guru tidak ada orang.'}
+        ]}
+    ]
+  },
+  {
+    id:'sec-2', color:'jade', num:2, zh:'状语', label:'Sebelum Kata Kerja',
+    sub:'Slot di antara Subjek dan Kata Kerja — waktu, kepastian, kata bantu, cara',
+    items:[
+      {type:'spectrum', title:'Tingkat kedekatan waktu akan terjadi', bab:'BAB 2 · 11',
+        note:'Pola dasar: S + (要/快/快要/就要) + V/adj + 了 — semakin ke kanan, semakin dekat & mendesak waktunya.',
+        steps:[
+          {lvl:'要...了', desc:'akan (netral)', cn:'老师要来了。', id:'Guru akan datang.'},
+          {lvl:'快...了', desc:'hampir', cn:'天快黑了。', id:'Hari hampir gelap.'},
+          {lvl:'快要...了', desc:'sebentar lagi', cn:'我快要毕业了。', id:'Aku sebentar lagi lulus.'},
+          {lvl:'就要...了', desc:'benar-benar mepet', cn:'考试就要到了。', id:'Ujian sebentar lagi tiba.'}
+        ]},
+      {type:'table', title:'Kata bantu modal (sebelum kata kerja)', bab:'BAB 1 · 4 · 14',
+        headers:['Kata','Arti','Nuansa'],
+        rows:[
+          ['要','harus / mau / akan','keinginan, rencana, kewajiban umum'],
+          ['应该','seharusnya','saran/nasihat, santai, tidak memaksa'],
+          ['得 (děi)','harus (mutlak)','paling kuat, wajib banget, terpaksa'],
+          ['只好 / 只能','terpaksa harus / cuma bisa','tidak ada pilihan lain, situasi memaksa'],
+          ['可以','boleh','izin atau kemampuan'],
+          ['会','akan / bisa','prediksi, lebih yakin dari 可能'],
+          ['可能','mungkin','dugaan, belum pasti']
+        ],
+        contoh:[
+          {cn:'你要多喝水。', id:'Kamu harus minum lebih banyak air.'},
+          {cn:'没车了，我只好走路。', id:'Tidak ada kendaraan, aku terpaksa jalan kaki.'},
+          {cn:'他明天可能会回来。', id:'Dia besok mungkin akan pulang.'}
+        ]},
+      {type:'card', bab:'BAB 12', rumus:'正在 / 在 / 正 + V + (呢)', arti:'Sedang melakukan sesuatu.',
+        note:'呢 saja (tanpa 在/正) sudah cukup menyiratkan "sedang", karena 呢 sendiri memberi kesan tindakan masih berlangsung.',
+        contoh:[{cn:'我正在吃饭。', id:'Aku sedang makan.'},{cn:'他正看电视呢。', id:'Dia sedang nonton TV.'}]},
+      {type:'card', bab:'BAB 12', rumus:'一边 + V1(O1)，一边 + V2(O2)', arti:'Sambil melakukan dua hal sekaligus.',
+        contoh:[{cn:'我一边喝咖啡，一边看书。', id:'Aku sambil minum kopi, sambil baca buku.'},{cn:'妈妈一边做饭，一边唱歌。', id:'Ibu sambil masak, sambil bernyanyi.'}]},
+      {type:'card', bab:'BAB 2', rumus:'(很) + kata sifat + 地 + V', arti:'Mengubah kata sifat jadi keterangan cara (dengan.../secara...).',
+        note:'Kata sifat 1 suku kata biasanya butuh tambahan 很 sebelum 地. Kata sifat 2 suku kata sering direduplikasi (AA/ABAB) supaya lebih hidup.',
+        contoh:[{cn:'他认真地学习。', id:'Dia belajar dengan serius.'},{cn:'他很快地跑。', id:'Dia lari dengan cepat.'},{cn:'她高高兴兴地回家。', id:'Dia pulang dengan sangat senang.'}]},
+      {type:'card', bab:'BAB 6 · 9', rumus:'把 + O (+...) sebelum V', arti:'Memindahkan objek ke depan kata kerja untuk menekankan hasil/perubahan pada objek itu.',
+        note:'Detail lengkap ada di bagian Struktur Khusus (nomor 7) — ini pola yang mengubah urutan normal kalimat.',
+        contoh:[{cn:'我把书放在桌子上。', id:'Aku meletakkan buku di atas meja.'}]}
+    ]
+  },
+  {
+    id:'sec-3', color:'metal', num:3, zh:'谓语V', label:'Kata Kerja (V) Inti',
+    sub:'Jenis dan perilaku khusus kata kerja sebagai jantung kalimat',
+    items:[
+      {type:'table', title:'Kata kerja pemberian: 给 / 送 / 发 / 寄', bab:'BAB 1',
+        headers:['Kata','Fokus','Pola'],
+        rows:[
+          ['给','kepada siapa (penerima) — arah pemberian','S+给+orang+V+(O) atau S+V+给+orang'],
+          ['送','memberi sebagai hadiah, antar langsung','S+送(给)+orang+benda'],
+          ['发','mengirim/membagikan (digital/fisik: pesan, email, gaji)','S+发(给)+orang+benda'],
+          ['寄','mengirim lewat jasa pengiriman/pos','S+寄(给)+orang+benda']
+        ],
+        contoh:[
+          {cn:'我给你钱。', id:'Aku kasih kamu uang.'},
+          {cn:'他送给我一本书。', id:'Dia memberiku sebuah buku.'},
+          {cn:'我发消息给你。', id:'Aku kirim pesan ke kamu.'},
+          {cn:'我寄包裹给你。', id:'Aku kirim paket ke kamu.'}
+        ]},
+      {type:'card', bab:'BAB 2', rumus:'S1 + V(opini) + (S2 + Predikat)', arti:'Kata kerja opini/pendapat diikuti klausa kecil sebagai objek pikiran.',
+        note:'Daftar kata kerja opini: 觉得(merasa/menurut), 认为(berpendapat, formal), 说(mengatakan), 想(berpikir ringan), 看(menurut, santai), 听说(katanya), 知道(tahu), 希望(berharap), 发现(menyadari), 相信(percaya), 决定(memutuskan), 担心(khawatir), 害怕(takut), 记得/忘记(ingat/lupa).',
+        contoh:[
+          {cn:'我觉得他很聪明。', id:'Aku pikir dia pintar sekali.'},
+          {cn:'我认为这个问题很难。', id:'Aku berpendapat masalah ini sulit.'},
+          {cn:'我听说他很有钱。', id:'Aku dengar-dengar dia kaya.'},
+          {cn:'我发现他不在家。', id:'Aku menyadari dia tidak di rumah.'}
+        ]},
+      {type:'card', bab:'BAB 3 · 7', rumus:'Pengulangan: AA / A一A / ABAB / V了V', arti:'Menunjukkan tindakan santai, sebentar, atau coba-coba.',
+        note:'Kata kerja 1 suku kata → AA (看看) atau A一A (看一看). Kata kerja 2 suku kata → ABAB (讨论讨论). Bisa ditambah 吧/呢 di akhir agar lebih santai.',
+        contoh:[{cn:'我想看看。', id:'Aku mau lihat-lihat dulu.'},{cn:'你尝尝这个蛋糕。', id:'Coba cicipi kue ini.'},{cn:'我们讨论讨论吧。', id:'Kita diskusi sebentar yuk.'}]},
+      {type:'card', bab:'BAB 11', rumus:'Kata kerja dipisah (离合词): disisipi 了/angka/objek', arti:'Kata kerja yang sebenarnya gabungan V+O, sehingga bisa disisipi di tengah.',
+        note:'Contoh: 生气, 帮忙, 睡觉, 洗澡, 请客, 见面, 聊天, 跳舞, 唱歌, 游泳, 放假.',
+        contoh:[
+          {cn:'我洗了一个澡。', id:'Aku sudah mandi (satu kali).'},
+          {cn:'别生他的气。', id:'Jangan marah kepada dia.'},
+          {cn:'我们见过一次面。', id:'Kami pernah bertemu satu kali.'}
+        ]}
+    ]
+  },
+  {
+    id:'sec-4', color:'water', num:4, zh:'补语', label:'Setelah Kata Kerja (Pelengkap)',
+    sub:'Bagian paling kaya — menentukan hasil, arah, durasi, dan intensitas tindakan',
+    items:[
+      {type:'card', bab:'umum', rumus:'V + 了', arti:'Tindakan sudah terjadi, ATAU keadaan berubah dari sebelumnya.',
+        contoh:[{cn:'他走了。', id:'Dia sudah pergi.'},{cn:'天冷了。', id:'Cuaca jadi dingin.'},{cn:'我不想去了。', id:'Aku sudah tidak ingin pergi.'}]},
+      {type:'card', bab:'BAB 15', rumus:'V + 过', arti:'Menyatakan pengalaman (pernah), tanpa menekankan kapan.',
+        note:'Bentuk negatif: 没 + V + 过.',
+        contoh:[{cn:'妹妹坐过飞机。', id:'Adik pernah naik pesawat.'},{cn:'我没去过北京。', id:'Aku belum pernah ke Beijing.'}]},
+      {type:'table', title:'Pelengkap hasil (V + X → hasil pasti)', bab:'BAB 4',
+        headers:['V + X','Arti hasil','Contoh'],
+        rows:[
+          ['V + 好','selesai dengan baik / siap','我做好了 (aku sudah melakukan dengan baik)'],
+          ['V + 完','selesai total','我写完作业 (aku selesai mengerjakan PR)'],
+          ['V + 上','berhasil / terpasang / tertutup','关上门 (tutup pintu sampai rapat)'],
+          ['V + 下','turun / lepas / tersimpan','他脱下外套了 (dia melepas jaket)'],
+          ['V + 到','berhasil mencapai/mendapat','我找到工作了 (aku berhasil dapat kerja)'],
+          ['V + 见','berhasil melihat/mendengar','我看见他 (aku melihat dia)'],
+          ['V + 开','terbuka / terpisah / jelas','门开了 (pintu terbuka)'],
+          ['V + 懂','mengerti setelah aksi','我听懂了 (aku mengerti)']
+        ]},
+      {type:'table', title:'Pelengkap arah & posisi hasil (V + X)', bab:'BAB 5',
+        headers:['V + X','Arti','Contoh'],
+        rows:[
+          ['V + 走','pergi / hilang / menjauh','他拿走了我的手机 (dia mengambil hpku)'],
+          ['V + 在','hasil berada di suatu tempat','书放在桌子上 (buku diletakkan di meja)'],
+          ['V + 满','penuh / terisi','杯子装满了水 (gelas penuh air)']
+        ]},
+      {type:'card', bab:'BAB 9', rumus:'来 / 去 — dan gabungan 进/出/上/下/回/过 + 来/去', arti:'来 = ke arah pembicara (kesini). 去 = menjauh dari pembicara (kesana).',
+        contoh:[
+          {cn:'请进来。', id:'Silakan masuk.'},
+          {cn:'你出去！', id:'Kamu keluar!'},
+          {cn:'把椅子搬过来。', id:'Pindahkan kursi kesini.'}
+        ]},
+      {type:'card', bab:'BAB 3', rumus:'Durasi setelah kata kerja', arti:'Menjelaskan berapa lama suatu kegiatan berlangsung.',
+        note:'4 pola: tanpa objek → S+V+了+durasi. Ada objek → S+V+了+durasi+(的)+O. Versi paling natural → S+V+O+V+了+durasi. Masih berlangsung → tambah 了 lagi di akhir.',
+        contoh:[
+          {cn:'我工作了十个小时。', id:'Aku bekerja selama 10 jam.'},
+          {cn:'我看电视看了两个小时。', id:'Aku nonton TV selama 2 jam.'},
+          {cn:'我做作业做了三个小时了。', id:'Aku sudah mengerjakan PR selama 3 jam (dan masih berlanjut).'}
+        ]},
+      {type:'card', bab:'BAB 4 · 13', rumus:'V + 了 + angka + 次 / 遍', arti:'Menyatakan frekuensi (berapa kali).',
+        note:'次 = fokus jumlah berapa kali (tak peduli selesai/tidak). 遍 = fokus proses lengkap dari awal sampai akhir.',
+        contoh:[{cn:'请再说一遍。', id:'Tolong ulangi sekali lagi (dari awal-akhir).'},{cn:'我们见过一次面。', id:'Kami pernah bertemu satu kali.'}]},
+      {type:'card', bab:'BAB 15', rumus:'kata sifat + 极了', arti:'Sangat / luar biasa — penekanan lebih kuat dari 很.',
+        note:'极了 tidak digabung dengan 很/非常/特别.',
+        contoh:[{cn:'今天热极了。', id:'Hari ini panas sekali.'},{cn:'这个菜好吃极了。', id:'Masakan ini enak sekali.'}]},
+      {type:'table', title:'Sisipan kecil setelah V/adj', bab:'BAB 3 · 7',
+        headers:['Bentuk','Arti','Contoh'],
+        rows:[
+          ['V + 一下','sebentar / coba, permintaan sopan','你帮我一下 (tolong bantu aku sebentar)'],
+          ['adj + 一点儿','lebih...sedikit, permintaan/saran','便宜一点儿 (lebih murah dikit)'],
+          ['adj: 有点儿','agak (cenderung negatif/keluhan)','我有点儿累 (aku agak capek)'],
+          ['adj: 比较','cukup/lumayan, netral','我比较累 (aku cukup capek)'],
+          ['adj: 挺','lumayan (cenderung positif)','这挺便宜 (ini lumayan murah)']
+        ]}
+    ]
+  },
+  {
+    id:'sec-5', color:'gold', num:5, zh:'宾语', label:'Objek (O)',
+    sub:'Apa yang dikenai tindakan, atau info tambahan setelah kata kerja',
+    items:[
+      {type:'card', bab:'umum', rumus:'kata benda biasa', arti:'Benda/hal yang dikenai tindakan.', contoh:[{cn:'我喝咖啡。', id:'Aku minum kopi.'}]},
+      {type:'card', bab:'BAB 7 · 10', rumus:'frasa dengan 的', arti:'的 mengubah sesuatu menjadi kata benda / menerangkan kata benda (=yang.../punya...).',
+        note:'Jenisnya: kata benda+的+N (我的书), kata kerja+的+N (我买的书, atau 吃的=makanan), kata sifat+的+N (漂亮的衣服), kalimat lengkap+的+N (我昨天在商店买的书), atau 的 sendirian menggantikan benda yang sudah jelas (红的好看).',
+        contoh:[{cn:'我的书。', id:'Bukuku.'},{cn:'我买的书。', id:'Buku yang aku beli.'},{cn:'漂亮的衣服。', id:'Baju yang cantik.'},{cn:'红的好看。', id:'Yang merah bagus.'}]},
+      {type:'table', title:'Angka perkiraan sebagai penjelas objek', bab:'BAB 13',
+        headers:['Bentuk','Arti','Contoh'],
+        rows:[
+          ['angka + 多 + satuan','lebih dari angka itu (bilangan bulat)','十多个人 (lebih dari 10 orang)'],
+          ['几 + satuan','jumlah kecil tak pasti','几个人 (beberapa orang) / 十几个人 (11-19 orang)'],
+          ['angka + satuan + 左右','sekitar, netral & fleksibel','十个人左右 (sekitar 10 orang)'],
+          ['差不多 + angka','hampir/sekitar, paling santai','差不多三百块 (sekitar 300 yuan)']
+        ]},
+      {type:'card', bab:'BAB 2', rumus:'klausa kecil (S2+Predikat) setelah kata kerja opini', arti:'Berfungsi sebagai objek dari kata kerja opini — lihat detail di bagian Kata Kerja Inti.',
+        contoh:[{cn:'我觉得他很聪明。', id:'Aku pikir dia pintar sekali.'}]},
+      {type:'card', bab:'BAB 12', rumus:'这儿 / 那儿 sebagai objek lokasi', arti:'Di sini / di sana.',
+        contoh:[{cn:'这儿很漂亮。', id:'Di sini cantik sekali.'},{cn:'你那儿冷吗？', id:'Di tempatmu dingin tidak?'}]}
+    ]
+  },
+  {
+    id:'sec-6', color:'jade', num:6, zh:'语气词', label:'Partikel Akhir Kalimat',
+    sub:'Kata penutup yang mengubah nada kalimat — pertanyaan, saran, penegasan',
+    items:[
+      {type:'table', title:'Partikel akhir', bab:'campuran BAB',
+        headers:['Partikel','Fungsi','Contoh'],
+        rows:[
+          ['了','perubahan keadaan (sekarang beda dari sebelumnya)','天冷了 (cuaca jadi dingin)'],
+          ['吗','pertanyaan netral, tanpa dugaan','你是学生吗？ (kamu siswa?)'],
+          ['吧','menebak / saran / ajakan, tidak memaksa','我们走吧。 (ayo kita pergi)'],
+          ['呢','menegaskan sedang berlangsung, nada santai','我吃饭呢。 (aku lagi makan)'],
+          ['...是不是？','minta konfirmasi, sudah hampir yakin','今天很冷，是不是？ (hari ini dingin, kan?)'],
+          ['...好吗？','minta persetujuan dengan sopan','我们一起去，好吗？ (kita pergi bareng, oke?)'],
+          ['的话','menutup klausa pengandaian (opsional setelah 如果/要是)','要是你有空的话... (kalau kamu senggang...)']
+        ]}
+    ]
+  },
+  {
+    id:'sec-7', color:'metal', num:'+', zh:'特殊句式', label:'Struktur Khusus',
+    sub:'Pola yang mengubah urutan normal S+V+O demi menekankan sesuatu',
+    items:[
+      {type:'card', bab:'BAB 6 · 9', rumus:'S + 把 + O + V + pelengkap hasil (+了)', arti:'Menekankan objek mengalami perubahan/dipindahkan akibat tindakan — fokusnya BUKAN pada tindakan, tapi hasil pada objek.',
+        note:'Syarat pakai 把: (1) objek jelas, (2) ada perubahan/hasil, (3) memang ingin menekankan hasil pada objek. Variannya: negatif pakai 没(有)+把; pindah tempat pakai 把+O+V(放)+在/到+tempat; pindah dari A ke B pakai 把+O+从+asal+V+到+tujuan; diberikan ke orang pakai 把+O+V+给+orang; bentuk perintah cukup 把+O+V+hasil！',
+        contoh:[
+          {cn:'我把手机放在床上。', id:'Aku meletakkan hp di atas kasur.'},
+          {cn:'我把书从桌子上拿到书包里。', id:'Aku memindahkan buku dari meja ke dalam tas.'},
+          {cn:'我把书还给你。', id:'Aku mengembalikan buku ke kamu.'},
+          {cn:'把灯打开！', id:'Nyalakan lampu!'}
+        ]},
+      {type:'card', bab:'BAB 6 · 5', rumus:'A + 跟/和 + B + (不)一样(+adj)  ·  又A又B', arti:'Membandingkan dua hal: sama/setara, atau berbeda; atau menekankan dua sifat sekaligus pada satu hal.',
+        note:'跟 = lisan/santai. 和 = formal, mirip "dan" dalam tulisan. 又...又... tidak bisa dinegatifkan langsung — bentuk negatifnya pakai 不...也不... atau 没有那么...也没有那么...',
+        contoh:[
+          {cn:'我跟他不一样。', id:'Aku berbeda dengan dia.'},
+          {cn:'他的衣服和我的一样。', id:'Baju dia sama dengan bajuku.'},
+          {cn:'这个地方又大又漂亮。', id:'Tempat ini besar dan cantik sekaligus.'},
+          {cn:'他不高也不帅。', id:'Dia tidak tinggi dan juga tidak ganteng.'}
+        ]},
+      {type:'card', bab:'BAB 9', rumus:'tempat + (arah) + 是 + benda/orang', arti:'Menyatakan apa yang ADA/berupa di suatu tempat — beda dengan 有 yang fokus pada "ada/tidaknya".',
+        note:'是 dipakai kalau posisi sudah jelas dan spesifik, dan kita hanya menjelaskan isinya. 有 dipakai kalau benda belum jelas, lebih seperti "di sana ada...".',
+        contoh:[
+          {cn:'桌子上是一本书。', id:'Di atas meja ada/berupa sebuah buku.'},
+          {cn:'我们学校旁边是一个很大的公园。', id:'Di samping sekolah kami ada taman yang besar.'}
+        ]}
+    ]
+  }
+];
+
+const colorNameMap = {seal:'火', gold:'土', jade:'木', metal:'金', water:'水'};
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderExamples(list){
+  if(!list || !list.length) return '';
+  return '<div class="examples">' + list.map(function(e){
+    return '<div class="ex"><span class="cn">'+esc(e.cn)+'</span><span class="id">'+esc(e.id)+'</span></div>';
+  }).join('') + '</div>';
+}
+
+function renderCard(it){
+  var html = '<div class="item">';
+  html += '<div class="item-top"><span class="bab-tag">'+esc(it.bab||'')+'</span></div>';
+  html += '<div class="rumus">'+esc(it.rumus)+'</div>';
+  html += '<p class="arti">'+esc(it.arti)+'</p>';
+  if(it.note) html += '<p class="note">'+esc(it.note)+'</p>';
+  html += renderExamples(it.contoh);
+  html += '</div>';
+  return html;
+}
+
+function renderTable(it){
+  var html = '<div class="item">';
+  html += '<div class="item-top"><strong>'+esc(it.title)+'</strong><span class="bab-tag">'+esc(it.bab||'')+'</span></div>';
+  if(it.note) html += '<p class="note">'+esc(it.note)+'</p>';
+  html += '<div class="tbl-wrap"><table class="gram"><thead><tr>';
+  it.headers.forEach(function(h){ html += '<th>'+esc(h)+'</th>'; });
+  html += '</tr></thead><tbody>';
+  it.rows.forEach(function(row){
+    html += '<tr>' + row.map(function(c){return '<td>'+esc(c)+'</td>';}).join('') + '</tr>';
+  });
+  html += '</tbody></table></div>';
+  if(it.contoh) html += renderExamples(it.contoh);
+  html += '</div>';
+  return html;
+}
+
+function renderSpectrum(it){
+  var html = '<div class="item">';
+  html += '<div class="item-top"><strong>'+esc(it.title)+'</strong><span class="bab-tag">'+esc(it.bab||'')+'</span></div>';
+  if(it.note) html += '<p class="note">'+esc(it.note)+'</p>';
+  html += '<div class="spectrum-row">';
+  it.steps.forEach(function(s, i){
+    html += '<div class="spectrum-step">';
+    html += '<div class="lvl">'+esc(s.lvl)+'</div>';
+    html += '<div class="desc">'+esc(s.desc)+'</div>';
+    html += '<div class="ex-cn">'+esc(s.cn)+'</div>';
+    html += '<div class="ex-id">'+esc(s.id)+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div class="spectrum-arrow">semakin ke kanan → semakin dekat waktunya</div>';
+  html += '</div>';
+  return html;
+}
+
+function renderItem(it){
+  if(it.type==='table') return renderTable(it);
+  if(it.type==='spectrum') return renderSpectrum(it);
+  return renderCard(it);
+}
+
+function buildPage(){
+  var stationsEl = document.getElementById('stations');
+  var tocEl = document.getElementById('toc');
+  var stationsHtml = '';
+  var tocHtml = '';
+
+  DATA.forEach(function(sec){
+    tocHtml += '<a href="#'+sec.id+'" data-toc-target="'+sec.id+'">'+
+      '<span class="chip" style="background:var(--'+sec.color+')">'+sec.num+'</span>'+
+      '<span class="txt">'+esc(sec.label)+'</span></a>';
+
+    var body = sec.items.map(renderItem).join('');
+    stationsHtml += ''+
+      '<section class="station" id="'+sec.id+'" data-color="'+sec.color+'">'+
+        '<details>'+
+          '<summary class="station-head">'+
+            '<span class="badge">'+sec.num+'</span>'+
+            '<span class="titles">'+
+              '<h2>'+esc(sec.zh)+' <span class="zh-tag">· '+esc(sec.label)+'</span></h2>'+
+              '<p>'+esc(sec.sub)+'</p>'+
+            '</span>'+
+            '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'+
+          '</summary>'+
+          '<div class="station-body">'+body+'</div>'+
+        '</details>'+
+      '</section>';
+  });
+
+  stationsEl.innerHTML = stationsHtml;
+  tocEl.innerHTML = tocHtml;
+
+  // hero svg click -> open + scroll to section
+  document.querySelectorAll('.station-node').forEach(function(node){
+    node.setAttribute('tabindex','0');
+    node.setAttribute('role','button');
+    var target = node.getAttribute('data-target');
+    function go(){
+      var el = document.getElementById(target);
+      if(!el) return;
+      var det = el.querySelector('details');
+      if(det) det.open = true;
+      el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    node.addEventListener('click', go);
+    node.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); } });
+  });
+
+  // open first section by default
+  var firstDetails = stationsEl.querySelector('details');
+  if(firstDetails) firstDetails.open = true;
+}
+
+buildPage();
+</script>
+</body>
+</html>
